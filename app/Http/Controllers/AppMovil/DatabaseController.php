@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AppMovil;
 use App\Http\Controllers\Controller;
 use App\Services\AppMovil\DatabaseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DatabaseController extends Controller
 {
@@ -18,6 +19,7 @@ class DatabaseController extends Controller
      */
     public function index()
     {
+        Log::info("DatabaseController index()");
         $movimientos = $this->databaseService->GetDataBase();
         return response()->json($movimientos);
     }

@@ -2,8 +2,8 @@
 
 namespace App\Services\AppMovil;
 
-use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class DatabaseService
@@ -12,12 +12,23 @@ class DatabaseService
 
     public function GetDataBase()
     {
+        Log::info("DatabaseService GetDataBase");
+        $clients = DB::table('client')->get();
+        $lockers = DB::table('locker')->get();
+        $users = DB::table('user')->get();
+        $controllers = DB::table('controller')->get();
+        $door_sizes = DB::table('door_size')->get();
+        $doors = DB::table('door')->get();
+        $movements = DB::table('movement')->get();
 
-        $users = DB::table('users')->get();
-        $lockers = DB::table('lockers')->get();
         $database = new stdClass();
-        $database->users = $users;
+        $database->clients = $clients;
         $database->lockers = $lockers;
+        $database->users = $users;
+        $database->controllers = $controllers;
+        $database->door_sizes = $door_sizes;
+        $database->doors = $doors;
+        $database->movements = $movements;
         return $database;
     }
 }
