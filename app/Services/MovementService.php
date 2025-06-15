@@ -10,10 +10,11 @@ class MovementService
 {
     public function __construct() {}
 
-    public function storeMovement($door_id, $code)
+    public function storeMovement($user_id, $door_id, $code)
     {
-        Log::info("MovementService storeMovement($door_id, $code)");
+        Log::info("MovementService storeMovement($user_id, $door_id, $code)");
         $insert = DB::table('movement')->insert([
+            "user_id" => $user_id,
             "door_id" => $door_id,
             "code" => $code,
         ]);

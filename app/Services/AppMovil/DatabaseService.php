@@ -20,6 +20,8 @@ class DatabaseService
         $door_sizes = DB::table('door_size')->get();
         $doors = DB::table('door')->get();
         $movements = DB::table('movement')->get();
+        $request_comand = DB::table('request_comand')->get();
+        $response_comand = DB::table('response_comand')->get();
 
         $database = new stdClass();
         $database->clients = $clients;
@@ -29,6 +31,8 @@ class DatabaseService
         $database->door_sizes = $door_sizes;
         $database->doors = $doors;
         $database->movements = $movements;
+        $database->request_comands = $request_comand;
+        $database->response_comands = $response_comand;
         return $database;
     }
 }
