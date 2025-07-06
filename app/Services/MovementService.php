@@ -12,7 +12,7 @@ class MovementService
 
     public function storeMovement($user_id, $door_id, $code)
     {
-        Log::info("MovementService storeMovement($user_id, $door_id, $code)");
+        Log::info("MovementService storeMovement ". jsonLog([$user_id, $door_id, $code]));
         $insert = DB::table('movement')->insert([
             "user_id" => $user_id,
             "door_id" => $door_id,

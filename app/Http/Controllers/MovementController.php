@@ -34,9 +34,9 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info("MovementService store($request->user_id,$request->door_id, $request->code)");
+        Log::info("MovementService store ". jsonLog($request->all()));
         try {
-            $this->movementService->storeMovement($request->user_id,$request->door_id, $request->code);
+            $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
             return response()->json([
                 "status" => "ok"
             ]);
