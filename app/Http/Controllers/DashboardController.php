@@ -13,7 +13,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        Log::info("DashboardController verificate " . jsonLog(Auth::user()));
+        Log::info("DashboardController rol " . jsonLog(Auth::user()->getCurrentRol));
+        Log::info("DashboardController session " . jsonLog(session('client_id')));
+        Log::info("DashboardController cliente " . jsonLog(Auth::user()->getClient));
         return view('pages.dashboard.index');
     }
 

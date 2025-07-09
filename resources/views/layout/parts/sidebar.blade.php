@@ -6,7 +6,7 @@
         <a href="{{ route('dashboard.index') }}">
             <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
                 <h4 class="text-2xl font-bold dark:text-white text-emerald-950">LOOK APP</h4>
-                <h4 class="text-xl dark:text-white text-emerald-950">Experience</h4>
+                <h4 class="text-xl dark:text-white text-emerald-950">{{ Auth::user()->getClient->name }}</h4>
             </span>
         </a>
     </div>

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -22,7 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-
+    private $client_id = "test";
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -45,9 +46,23 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function getCurrentCompany()
+
+    public function getCurrentRol()
     {
-        return ;
+        $roles = $this->belongsToMany(User::class, 'users_rol', 'users_id', 'users_id')
+            ->select('rol.name')
+            ->join('rol', 'rol.rol_id', 'users_rol.rol_id')
+            ->where('users_rol.users_id', $this->id);
+        return $roles;
     }
 
+    public function getClient()
+    {
+        $client = $this->hasOne(UserClient::class)
+            ->select('client.*')
+            ->join('client', 'client.client_id', 'user_client.client_id')
+            ->where('user_client.client_id', session('client_id'))/* ->toSql() */;
+        /* dd($client, session('client_id')); */
+        return $client;
+    }
 }

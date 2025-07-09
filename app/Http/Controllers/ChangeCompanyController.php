@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Services\ChangeCompanyService;
+use App\Services\LoginService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ChangeCompanyController extends Controller
 {
     private ChangeCompanyService $changeCompanyService;
-    public function __construct(ChangeCompanyService $_changeCompanyService)
+    private LoginService $loginService;
+
+    public function __construct(ChangeCompanyService $_changeCompanyService, LoginService $_loginService)
     {
         $this->changeCompanyService = $_changeCompanyService;
+        $this->loginService = $_loginService;
     }
     /**
      * Display a listing of the resource.
@@ -25,7 +30,9 @@ class ChangeCompanyController extends Controller
 
     public function change(Request $request)
     {
-        Log::info("ChangeCompanyController change ".jsonLog($request->all()));
+        Log::info("ChangeCompanyController change " . jsonLog($request->all()));
+        $empresa = $this->loginService->getChangeCompany(Auth::user()->id, $request->client_id);
+        $request->session()->put('client_id', $empresa->client_id);
         return redirect()->route('dashboard.index');
     }
 

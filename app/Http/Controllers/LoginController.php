@@ -37,8 +37,9 @@ class LoginController extends Controller
             'email' => $request->email,
             'password' => $request->password,
         ])) {
+            $empresa = $this->loginService->getCLientDefault(Auth::user()->id);
+            $request->session()->put('client_id', $empresa->client_id);
             $request->session()->regenerate();
-            Log::info("LoginController enviar dashboard ");
             return redirect()->route('dashboard.index');
         }
         Log::info("LoginController enviar Correo no valido ");
