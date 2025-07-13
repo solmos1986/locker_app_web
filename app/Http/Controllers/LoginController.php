@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Services\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +14,9 @@ class LoginController extends Controller
      * Display a listing of the resource.
      */
     private LoginService $loginService;
-    public function __construct(LoginService $_loginService)
+    public function __construct(LoginService $loginService)
     {
-        $this->loginService = $_loginService;
+        $this->loginService = $loginService;
     }
     public function index()
     {

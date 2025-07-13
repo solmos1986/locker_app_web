@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\MovementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class MovementController extends Controller
 {
@@ -12,6 +13,13 @@ class MovementController extends Controller
     public function __construct(MovementService $_movementService)
     {
         $this->movementService = $_movementService;
+    }
+
+    public function dataTable()
+    {
+        Log::info("MovementController dataTable ");
+        $movements = $this->movementService->getMovimientos();
+        return DataTables::of($movements)->make(true);
     }
     /**
      * Display a listing of the resource.
@@ -34,7 +42,7 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info("MovementService store ". jsonLog($request->all()));
+        Log::info("MovementService store " . jsonLog($request->all()));
         try {
             $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
             return response()->json([

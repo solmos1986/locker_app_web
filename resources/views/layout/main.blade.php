@@ -7,6 +7,8 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     @vite('resources/css/tailwind-admin.css')
+
+    @stack('css-header')
 </head>
 
 <body x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'));
@@ -51,5 +53,18 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
     </div>
     <!-- ===== Page Wrapper End ===== -->
 </body>
+
+<script>
+    var base_url = "{{ url('/') }}";
+</script>
+
+@stack('java-script')
+<script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+</script>
 
 </html>

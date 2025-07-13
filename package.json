@@ -16,6 +16,7 @@
     "dependencies": {
         "@alpinejs/persist": "^3.14.9",
         "alpinejs": "^3.14.9",
+        "datatables.net-dt": "^2.3.2",
         "dropzone": "^6.0.0-beta.2",
         "flatpickr": "^4.6.13"
     }

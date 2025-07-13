@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChangeCompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MovementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LoginController::class, 'index'])->name('login');
@@ -17,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('', function () {
             return view('pages.movements.index');
         })->name('movement.index');
+        Route::get('data-table', [MovementController::class, 'dataTable'])->name('movement.dataTable');
     });
 
     Route::prefix('door')->group(function () {
