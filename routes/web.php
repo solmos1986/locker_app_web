@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChangeCompanyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LockerController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MovementController;
 use Illuminate\Support\Facades\Route;
@@ -21,10 +22,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('data-table', [MovementController::class, 'dataTable'])->name('movement.dataTable');
     });
 
+    Route::prefix('locker')->group(function () {
+        Route::get('', [LockerController::class, 'index'])->name('locker.index');
+        Route::get('data-table', [LockerController::class, 'dataTable'])->name('movement.dataTable');
+    });
+
     Route::prefix('door')->group(function () {
         Route::get('', function () {
             return view('pages.movements.index');
         })->name('door.index');
+    });
+
+    Route::prefix('resident')->group(function () {
+        Route::get('', function () {
+            return view('pages.movements.index');
+        })->name('resident.index');
     });
 
     Route::prefix('dashboard')->group(function () {

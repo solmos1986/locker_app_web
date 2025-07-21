@@ -11,8 +11,9 @@
     @stack('css-header')
 </head>
 
-<body x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'));
-$watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))" :class="{ 'dark bg-gray-900': darkMode === true }">
+<body data-url_base="{{ url('/') }}" x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }" x-init="darkMode = JSON.parse(localStorage.getItem('darkMode'));
+$watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{ 'dark bg-gray-900': darkMode === true }">
 
     <!-- ===== Preloader Start ===== -->
     <div x-show="loaded" x-init="window.addEventListener('DOMContentLoaded', () => { setTimeout(() => loaded = false, 500) })"
@@ -54,17 +55,14 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
     <!-- ===== Page Wrapper End ===== -->
 </body>
 
-<script>
-    var base_url = "{{ url('/') }}";
-</script>
 
-@stack('java-script')
 <script>
-    $.ajaxSetup({
+    /* $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-    });
+    }); */
 </script>
-
+@vite('resources/js/layout.ts')
+@stack('java-script')
 </html>

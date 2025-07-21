@@ -20,6 +20,7 @@ class MovementService
         Log::info("MovementService VerificateRol " . jsonLog(VerificateRol('admin')));
         $movements = DB::table('movement')
             ->select(
+                'movement.movement_id',
                 'user.name as recident',
                 'door.number as department',
                 'movement.create_at',

@@ -14,266 +14,35 @@
             <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
                 <div class="px-5 py-4 sm:px-6 sm:py-5">
                     <h3 id="modal-movement" class="text-base font-medium text-gray-800 dark:text-white/90">
-                        Movimientos
+                        Armarios
                     </h3>
                 </div>
                 <div class="p-5 border-t border-gray-100 dark:border-gray-800 sm:p-6">
                     <!-- ====== Table Six Start -->
+                    <div class="flex flex-row-reverse">
+                        <button onclick=""
+                        class="inline-flex items-center gap-2 px-2 py-1 font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 ">
+                        Nuevo armario
+                    </button>
+                    </div>
                     <table class="table-auto min-w-full" id="table-movemnt">
                         <thead>
                             <tr class="border-b border-gray-100 dark:border-gray-800">
                                 <th class="px-5 py-3 sm:px-6">
-                                    Recidente
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    Departamento
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    Fecha de creacion
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    Fecha de Modificacion
+                                    Descripcion armario
                                 </th>
                                 <th class="px-5 py-3 sm:px-6">
                                     Estado
+                                </th>
+                                <th class="px-5 py-3 sm:px-6">
+                                    Controladores
                                 </th>
                                 <th class="px-5 py-3 sm:px-6">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
-                        {{--  <thead>
-                            <tr class="border-b border-gray-100 dark:border-gray-800">
-                                <th class="px-5 py-3 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
-                                            User
-                                        </p>
-                                    </div>
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
-                                            Project Name
-                                        </p>
-                                    </div>
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
-                                            Team
-                                        </p>
-                                    </div>
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
-                                            Status
-                                        </p>
-                                    </div>
-                                </th>
-                                <th class="px-5 py-3 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">
-                                            Budget
-                                        </p>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
 
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                            <tr>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 overflow-hidden rounded-full">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-
-                                            <div>
-                                                <span
-                                                    class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                                    Lindsey Curtis
-                                                </span>
-                                                <span class="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                                    Web Designer aaaa
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                                            Agency Website
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex -space-x-2">
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p
-                                            class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">
-                                            Active
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">3.9K</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 overflow-hidden rounded-full">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-
-                                            <div>
-                                                <span
-                                                    class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                                    Lindsey Curtis
-                                                </span>
-                                                <span class="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                                    Web Designer
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                                            Agency Website
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex -space-x-2">
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p
-                                            class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">
-                                            Active
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">3.9K</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 overflow-hidden rounded-full">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-
-                                            <div>
-                                                <span
-                                                    class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                                                    Lindsey Curtis
-                                                </span>
-                                                <span class="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                                    Web Designer
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">
-                                            Agency Website
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <div class="flex -space-x-2">
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
-                                                <img src="{{ asset('/images/user.jpg') }}" alt="User"
-                                                    class="overflow-hidden rounded-full" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p
-                                            class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">
-                                            Active
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex items-center">
-                                        <p class="text-gray-500 text-theme-sm dark:text-gray-400">3.9K</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
- --}}
                     </table>
                 </div>
             </div>
@@ -281,7 +50,8 @@
     </div>
 
     <div class="fixed inset-0 items-center justify-center hidden p-5 overflow-y-auto modal z-99999" id="modal">
-        <div onclick="closeModal()" class="modal-close-btn fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"></div>
+        <div onclick="closeModal()" class="modal-close-btn fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]">
+        </div>
         <div
             class="modal-dialog modal-dialog-scrollable modal-lg no-scrollbar relative flex w-full max-w-[700px] flex-col overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-11">
             <!-- close btn -->
@@ -302,7 +72,7 @@
                         id="eventModalLabel">
                         Modificar movimiento
                     </h5>
-                   {{--  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{--  <p class="text-sm text-gray-500 dark:text-gray-400">
                         
                     </p> --}}
                 </div>
@@ -469,6 +239,6 @@
                 console.log('foo');
             }); */
         </script>
-        @vite('resources/js/pages/movements/index.ts')
+        @vite('resources/js/pages/locker/index.ts')
     @endpush
 @endsection

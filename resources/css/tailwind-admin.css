@@ -743,3 +743,7 @@ span.flatpickr-weekday,
   opacity: 0.8;
   cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
+
+.bg-error {
+     background-color: var(--color-error-600);
+}
