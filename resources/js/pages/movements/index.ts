@@ -7,8 +7,8 @@ const dataTableMovement = dataTableServeSide({
     url: `${base_url}/movement/data-table`,
     columns: [
         {
-            data: "recident",
-            name: "recident",
+            data: "resident",
+            name: "resident",
         },
         {
             data: "department",

@@ -16,9 +16,14 @@
     },
     "dependencies": {
         "@alpinejs/persist": "^3.14.9",
+        "@types/form-serialize": "^0.7.4",
+        "@types/validator": "^13.15.2",
         "alpinejs": "^3.14.9",
         "datatables.net-dt": "^2.3.2",
         "dropzone": "^6.0.0-beta.2",
-        "flatpickr": "^4.6.13"
+        "flatpickr": "^4.6.13",
+        "form-serialize": "^0.7.2",
+        "sweetalert2": "^11.22.2",
+        "validator": "^13.15.15"
     }
 }

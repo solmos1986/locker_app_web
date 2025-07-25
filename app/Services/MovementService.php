@@ -21,7 +21,7 @@ class MovementService
         $movements = DB::table('movement')
             ->select(
                 'movement.movement_id',
-                'user.name as recident',
+                'user.name as resident',
                 'door.number as department',
                 'movement.create_at',
                 'movement.delivered',

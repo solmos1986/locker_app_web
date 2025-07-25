@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LockerController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MovementController;
+use App\Http\Controllers\ResidentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LoginController::class, 'index'])->name('login');
@@ -34,9 +35,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('resident')->group(function () {
-        Route::get('', function () {
-            return view('pages.movements.index');
-        })->name('resident.index');
+        Route::get('', [ResidentController::class, 'index'])->name('resident.index');
+        Route::get('data-table', [ResidentController::class, 'dataTable'])->name('resident.dataTable');
+        Route::post('', [ResidentController::class, 'store'])->name('resident.store');
+        Route::get('/{id}', [ResidentController::class, 'edit'])->name('resident.edit');
+        Route::put('/{id}', [ResidentController::class, 'update'])->name('resident.update');
+        Route::post('/{id}', [ResidentController::class, 'delete'])->name('resident.delete');
     });
 
     Route::prefix('dashboard')->group(function () {

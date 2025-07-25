@@ -4,14 +4,15 @@ interface IModal {
 }
 
 export const openModal = ({ elementId, lockModal }: IModal): void => {
-    document.getElementById('modal')!.style.display = "flex";
+    document.getElementById(elementId)!.style.display = "flex";
     if (lockModal) {
 
     }
 };
 
 export const closeModal = (elementId: string): void => {
-    document.getElementById('modal')!.style.display = "none";
+    console.log('closeModal', elementId)
+    document.getElementById(elementId)!.style.display = "none";
 };
 
 declare global {

@@ -21,9 +21,9 @@
                     <!-- ====== Table Six Start -->
                     <div class="flex flex-row-reverse">
                         <button onclick=""
-                        class="inline-flex items-center gap-2 px-2 py-1 font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 ">
-                        Nuevo armario
-                    </button>
+                            class="inline-flex items-center gap-2 px-2 py-1 font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 ">
+                            Nuevo armario
+                        </button>
                     </div>
                     <table class="table-auto min-w-full" id="table-movemnt">
                         <thead>
