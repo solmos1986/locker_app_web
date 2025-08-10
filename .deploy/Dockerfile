@@ -2,7 +2,7 @@ ARG PHP_VERSION=${PHP_VERSION:-8.4}
 FROM php:8.4-fpm-alpine AS php-system-setup
 
 # Install system dependencies
-RUN apk add --no-cache dcron busybox-suid libcap curl zip unzip git
+RUN apk add --no-cache dcron busybox-suid libcap curl zip unzip git nodejs npm
 
 # Install PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
@@ -41,6 +41,10 @@ RUN chown -R $NON_ROOT_USER:$NON_ROOT_GROUP $LARAVEL_PATH
 USER $NON_ROOT_USER
 RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
 RUN rm -rf /home/$NON_ROOT_USER/.composer
+
+# install dependecias
+RUN npm install
+RUN npm build
 
 # Copy app
 COPY --chown=$NON_ROOT_USER:$NON_ROOT_GROUP . $LARAVEL_PATH/
