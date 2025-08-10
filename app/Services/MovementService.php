@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
-use function Laravel\Prompts\select;
-
 class MovementService
 {
     public function __construct() {}

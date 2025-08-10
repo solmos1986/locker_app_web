@@ -1,4 +1,4 @@
-ARG PHP_VERSION=${PHP_VERSION:-8.4}
+ARG PHP_VERSION=${PHP_VERSION:-8.2}
 FROM php:${PHP_VERSION}-fpm-alpine AS php-system-setup
 
 # Install system dependencies
@@ -40,6 +40,7 @@ COPY composer.json composer.lock ./
 RUN chown -R $NON_ROOT_USER:$NON_ROOT_GROUP $LARAVEL_PATH
 USER $NON_ROOT_USER
 RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
+RUN composer dump-autoload
 RUN rm -rf /home/$NON_ROOT_USER/.composer
 
 # Copy app

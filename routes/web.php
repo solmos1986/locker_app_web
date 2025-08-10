@@ -25,7 +25,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('locker')->group(function () {
         Route::get('', [LockerController::class, 'index'])->name('locker.index');
-        Route::get('data-table', [LockerController::class, 'dataTable'])->name('movement.dataTable');
+        Route::get('data-table', [LockerController::class, 'dataTable'])->name('locker.dataTable');
     });
 
     Route::prefix('door')->group(function () {
