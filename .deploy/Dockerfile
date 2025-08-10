@@ -1,5 +1,5 @@
-ARG PHP_VERSION=${PHP_VERSION:-8.2}
-FROM php:${PHP_VERSION}-fpm-alpine AS php-system-setup
+ARG PHP_VERSION=${PHP_VERSION:-8.4}
+FROM php:8.4-fpm-alpine AS php-system-setup
 
 # Install system dependencies
 RUN apk add --no-cache dcron busybox-suid libcap curl zip unzip git
