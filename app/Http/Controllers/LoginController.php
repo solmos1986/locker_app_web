@@ -13,10 +13,10 @@ class LoginController extends Controller
     /**
      * Display a listing of the resource.
      */
-    private LoginService $loginService;
-    public function __construct(LoginService $loginService)
+    //private LoginService $loginService;
+    public function __construct(/* LoginService $loginService */)
     {
-        $this->loginService = $loginService;
+       /*  $this->loginService = $loginService; */
     }
     public function index()
     {
@@ -28,7 +28,7 @@ class LoginController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function verificate(Request $request)
+    /* public function verificate(Request $request)
     {
         Log::info("LoginController verificate " . jsonLog($request->all()));
 
@@ -47,7 +47,7 @@ class LoginController extends Controller
         return back()->withErrors([
             'email' => 'Correo no valido.',
         ])->onlyInput('email');
-    }
+    } */
 
 
     /**
