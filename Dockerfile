@@ -1,54 +1,69 @@
-# Use a base image with PHP-FPM, suitable for Laravel
-FROM php:8.3-fpm-alpine
+# Stage 1: Build environment and Composer dependencies
+FROM php:8.4-fpm-alpine AS builder
 
-# Install system dependencies
+# Install system dependencies and PHP extensions for Laravel with common database support
 RUN apk add --no-cache \
-    nginx \
-    supervisor \
     git \
     curl \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
     libzip-dev \
-    icu-dev
+    libpng-dev \
+    jpeg-dev \
+    freetype-dev \
+    postgresql-dev \
+    mysql-client \
+    nodejs \
+    npm \
+    icu-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    sqlite-dev \
+    zip \
+    unzip \
+    nginx # For serving assets in a later stage if needed
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql gd zip bcmath opcache intl
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip gd intl opcache bcmath exif pcntl sockets
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy application source code
 COPY . .
 
 # Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Optimize Laravel
-RUN php artisan optimize
+# Clear Laravel caches and optimize
+RUN php artisan cache:clear \
+    && php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && php artisan optimize
 
-# Set permissions
+# Stage 2: Production image
+FROM php:8.4-fpm-alpine
+
+# Install necessary runtime dependencies
+RUN apk add --no-cache \
+    libzip \
+    libpng \
+    libjpeg \
+    freetype \
+    postgresql-libs \
+    libintl \
+    libxml2 \
+    sqlite-libs
+
+# Copy installed Composer dependencies and application code from the builder stage
+COPY --from=builder /var/www/html /var/www/html
+
+# Set appropriate permissions for Laravel storage and bootstrap/cache directories
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Copy Nginx configuration
-COPY .docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+WORKDIR /var/www/html
 
-ARG DB_CONNECTION=${DB_CONNECTION}
-ARG DB_HOST=${DB_HOST}
-ARG DB_PORT=${DB_PORT}
-ARG DB_DATABASE=${DB_DATABASE}
-ARG DB_USERNAME=${DB_USERNAME}
-ARG DB_PASSWORD=${DB_PASSWORD}
-
-# Expose port 80 for Nginx
-EXPOSE 80
-
-# Start PHP-FPM and Nginx using Supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["php-fpm"]
