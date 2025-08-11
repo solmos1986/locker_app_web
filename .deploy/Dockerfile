@@ -21,7 +21,7 @@ COPY --from=composer/composer:2 /usr/bin/composer /usr/local/bin/composer
 FROM php-system-setup AS app-setup
 
 # Set working directory
-ENV LARAVEL_PATH=/
+ENV LARAVEL_PATH=/srv/app
 WORKDIR $LARAVEL_PATH
 
 RUN curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
