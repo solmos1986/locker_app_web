@@ -44,7 +44,8 @@ USER $NON_ROOT_USER
 RUN echo node -v
 RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
 
-RUN npm install npm run build
+RUN npm install
+RUN npm run build
 
 RUN rm -rf /home/$NON_ROOT_USER/.composer
 
