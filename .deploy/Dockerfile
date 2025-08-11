@@ -24,7 +24,7 @@ FROM php-system-setup AS app-setup
 ENV LARAVEL_PATH=/srv/app
 WORKDIR $LARAVEL_PATH
 
-RUN curl -sL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
 
 # Add non-root user: 'app'
 ARG NON_ROOT_GROUP=${NON_ROOT_GROUP:-app}
