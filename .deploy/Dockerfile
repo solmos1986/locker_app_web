@@ -1,11 +1,9 @@
-# Stage 1: Build frontend assets
-FROM node:22-alpine AS frontend_builder
-
 ARG PHP_VERSION=${PHP_VERSION:-8.4}
+FROM node:lts AS build
 FROM php:8.4-fpm-alpine AS php-system-setup
 
 # Install system dependencies
-RUN apk add --no-cache dcron busybox-suid libcap curl zip unzip git nodejs npm 
+RUN apk add --no-cache dcron busybox-suid libcap curl zip unzip git nodejs npm
 
 # Install PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
@@ -48,7 +46,8 @@ RUN echo node -v
 RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
 
 RUN echo "install"
-RUN npm install && npm run build
+RUN npm i
+RUN npm run build
 
 RUN rm -rf /home/$NON_ROOT_USER/.composer
 
