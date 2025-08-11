@@ -1,3 +1,6 @@
+# Stage 1: Build frontend assets
+FROM node:22-alpine AS frontend_builder
+
 ARG PHP_VERSION=${PHP_VERSION:-8.4}
 FROM php:8.4-fpm-alpine AS php-system-setup
 
