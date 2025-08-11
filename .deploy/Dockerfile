@@ -42,9 +42,9 @@ COPY composer.json composer.lock ./
 RUN chown -R $NON_ROOT_USER:$NON_ROOT_GROUP $LARAVEL_PATH
 USER $NON_ROOT_USER
 RUN echo node -v
-RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader \
-    && npm install \
-    && npm run build
+RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader
+
+RUN npm install npm run build
 
 RUN rm -rf /home/$NON_ROOT_USER/.composer
 
