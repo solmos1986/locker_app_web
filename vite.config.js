@@ -8,7 +8,7 @@ export default defineConfig({
             input: [
                 "resources/css/app.css",
                 "resources/css/tailwind-admin.css",
-                "resources/js/main.js",
+                "resources/js/app.js",
                 "resources/css/libs/datatable.css",
                 "resources/js/pages/movements/index.ts",
                 "resources/js/pages/locker/index.ts",
