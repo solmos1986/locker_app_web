@@ -30,7 +30,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "App\\Services\\LoginService": "app/services"
+            "App\\Services\\": "app/services/"
         },
         "files": [
             "app/helpers.php"
