@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
-class LoginService 
+class loginService 
 {
     public function __construct() {}
 

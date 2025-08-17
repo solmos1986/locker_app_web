@@ -41,7 +41,7 @@ RUN chown -R $NON_ROOT_USER:$NON_ROOT_GROUP /etc/crontabs/$NON_ROOT_USER && setc
 # Switch to non-root 'app' user & install app dependencies
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
-COPY /srv/app/services/ ./ 
+COPY . ./ 
 
 RUN chown -R $NON_ROOT_USER:$NON_ROOT_GROUP $LARAVEL_PATH
 USER $NON_ROOT_USER
