@@ -34,7 +34,7 @@
         },
         "files": [
             "app/helpers.php",
-            "app/services/loginController.php"  
+            "app/services/loginService.php"  
         ]
     },
     "autoload-dev": {
