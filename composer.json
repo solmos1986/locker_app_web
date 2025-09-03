@@ -33,7 +33,8 @@
             "App\\Services\\": "app/services/"
         },
         "files": [
-            "app/helpers.php"
+            "app/helpers.php",
+            "app/services/loginController.php"  
         ]
     },
     "autoload-dev": {
