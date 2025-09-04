@@ -33,7 +33,12 @@
         },
         "files": [
             "app/helpers.php",
-            "app/Services/loginService.php"  
+            "app/Services/loginService.php",
+            "app/Services/changeCompanyService.php",
+            "app/Services/lockerService.php",
+            "app/Services/movementService.php",
+            "app/Services/residentService.php",
+            "app/Services/userService.php"
         ]
     },
     "autoload-dev": {

@@ -20,7 +20,6 @@ import "./components/image-resize"; */
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 Alpine.start();
-
 // Init flatpickr
 flatpickr(".datepicker", {
   mode: "range",

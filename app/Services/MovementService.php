@@ -21,6 +21,7 @@ class MovementService
                 'movement.movement_id',
                 'user.name as resident',
                 'door.number as department',
+                'movement.code',
                 'movement.create_at',
                 'movement.delivered',
             )
