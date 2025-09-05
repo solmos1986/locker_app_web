@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Services\MovementService;
@@ -46,11 +45,12 @@ class MovementController extends Controller
         try {
             $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
             return response()->json([
-                "status" => "ok"
+                "status" => "ok",
             ]);
         } catch (\Throwable $th) {
+            Log::error("message");("MovementService store " . jsonLog($th));
             return response()->json([
-                "status" => "error"
+                "status" => "error",
             ]);
         }
     }
@@ -80,11 +80,11 @@ class MovementController extends Controller
         try {
             $this->movementService->updateMovement($request->movement_id);
             return response()->json([
-                "status" => "ok"
+                "status" => "ok",
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                "status" => "error"
+                "status" => "error",
             ]);
         }
     }
