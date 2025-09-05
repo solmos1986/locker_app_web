@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use stdClass;
 
 class MovementService
 {
-    public function __construct() {}
+    public function __construct()
+    {}
 
     public function getMovimientos()
     {
@@ -36,11 +35,12 @@ class MovementService
     {
         Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code]));
         $insert = DB::table('movement')->insert([
-            "user_id" => $user_id,
-            "door_id" => $door_id,
-            "client_id"=> Auth::user()->getClient->client_id,
-            "code" => $code,
+            "user_id"   => $user_id,
+            "door_id"   => $door_id,
+            "client_id" => Auth::user()->getClient->client_id,
+            "code"      => $code,
         ]);
+        Log::info("MovementService storeMovement insert " . jsonLog($insert));
     }
 
     public function updateMovement($movement_id)
