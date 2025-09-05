@@ -11,7 +11,7 @@ export function dataTableServeSide({ elementId, url, columns }: IDataTableServeS
     const dataTableMovement = new DataTable(elementId, {
         processing: true,
         serverSide: true,
-        scrollCollapse: true,
+        scrollCollapse: false,
         ajax: url,
         language: {
             searchPlaceholder: "...",

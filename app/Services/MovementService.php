@@ -38,6 +38,7 @@ class MovementService
         $insert = DB::table('movement')->insert([
             "user_id" => $user_id,
             "door_id" => $door_id,
+            "client_id"=> Auth::user()->getClient->client_id,
             "code" => $code,
         ]);
     }
