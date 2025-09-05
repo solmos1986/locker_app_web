@@ -41,14 +41,14 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info("MovementService store " . jsonLog($request->all()));
+        Log::info("MovementController store " . jsonLog($request->all()));
         try {
             $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
             return response()->json([
                 "status" => "ok",
             ]);
         } catch (\Throwable $th) {
-            Log::error("message");("MovementService store " . jsonLog($th));
+            Log::error("MovementController store " . jsonLog($th));
             return response()->json([
                 "status" => "error",
             ]);

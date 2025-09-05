@@ -33,7 +33,7 @@ class MovementService
 
     public function storeMovement($user_id, $door_id, $code)
     {
-        Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code]));
+        Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code, Auth::user()->getClient->client_id]));
         $insert = DB::table('movement')->insert([
             "user_id"   => $user_id,
             "door_id"   => $door_id,
