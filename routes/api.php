@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppMovil\DatabaseController;
-use App\Http\Controllers\MovementController;
+use App\Http\Controllers\AppMovil\MovementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

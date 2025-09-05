@@ -13,8 +13,8 @@ class LoginController extends Controller
     /**
      * Display a listing of the resource.
      */
-    private loginService $loginService;
-    public function __construct(loginService $loginService)
+    protected LoginService $loginService;
+    public function __construct(LoginService $loginService)
     {
         $this->loginService = $loginService;
     }

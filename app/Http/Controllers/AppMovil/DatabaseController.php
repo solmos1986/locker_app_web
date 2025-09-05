@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class DatabaseController extends Controller
 {
-    private DatabaseService $databaseService;
+    protected $databaseService;
     public function __construct(DatabaseService $_databaseService)
     {
         $this->databaseService = $_databaseService;

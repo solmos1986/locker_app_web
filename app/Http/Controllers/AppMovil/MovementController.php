@@ -1,30 +1,30 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AppMovil;
 
+use App\Http\Controllers\Controller;
+use App\Services\AppMovil\DatabaseService;
 use App\Services\AppMovil\MovementAppMovilService;
-use App\Services\MovementService;
+use App\Services\AppMovil\MovementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
 
 class MovementController extends Controller
 {
+    protected $databaseService;
     protected $movementService;
-    public function __construct(
-        MovementService $movementService
-    ) {
-        $this->movementService = $movementService;
-    }
-
-    public function dataTable()
-    {
-        Log::info("MovementController dataTable ");
-        $movements = $this->movementService->getMovimientos();
-        return DataTables::of($movements)->make(true);
-    }
+    protected $movementAppMovilService;
     /**
      * Display a listing of the resource.
      */
+    public function __construct(
+        MovementService $movementService,
+        MovementAppMovilService $movementAppMovilService,
+        DatabaseService $databaseService
+    ) {
+        $this->movementService         = $movementService;
+        $this->movementAppMovilService = $movementAppMovilService;
+        $this->databaseService         = $databaseService;
+    }
     public function index()
     {
         //
@@ -43,9 +43,12 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info("MovementController store " . jsonLog($request->all()));
+        Log::info("MovementController AppMovil store " . jsonLog($request->all()));
         try {
+            $this->databaseService->GetDataBase();
+            //$this->movementAppMovilService->storeMovement($request->user_id, $request->door_id, $request->code);
             $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
+
             return response()->json([
                 "status" => "ok",
             ]);
@@ -76,19 +79,9 @@ class MovementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
-        Log::info("MovementService update ($request->movement_id)");
-        try {
-            $this->movementService->updateMovement($request->movement_id);
-            return response()->json([
-                "status" => "ok",
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "status" => "error",
-            ]);
-        }
+        //
     }
 
     /**
