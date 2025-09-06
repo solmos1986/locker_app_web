@@ -45,7 +45,8 @@ class MovementService
             "client_id" => 1,
             "code"      => $code,
         ]);
-
+        $movement = DB::table('movement')->join('door', 'movement.door_id', 'door.door_id')->where('movement_id', $movement_id)
+            ->first();
         $data = [
             "id"              => $id,
             "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
@@ -56,7 +57,7 @@ class MovementService
             "collectToken"    => $code,
             "status"          => "allocated",
             "senderId"        => "delivery",
-            "receiverId"      => "905",
+            "receiverId"      => $movement->number,
             "activate"        => true,
             "collected"       => false,
             "delivered"       => true,
@@ -96,7 +97,7 @@ class MovementService
             ->update([
                 "delivered" => 1,
             ]);
-        $movement = DB::table('movement')->where('movement_id', $movement_id)
+        $movement = DB::table('movement')->join('door', 'movement.door_id', 'door.door_id')->where('movement_id', $movement_id)
             ->first();
 
         $data = [
@@ -109,7 +110,7 @@ class MovementService
             "collectToken"    => $movement->code,
             "status"          => "collected",
             "senderId"        => "delivery",
-            "receiverId"      => "905",
+            "receiverId"      => $movement->number,
             "activate"        => true,
             "collected"       => true,
             "delivered"       => true,
