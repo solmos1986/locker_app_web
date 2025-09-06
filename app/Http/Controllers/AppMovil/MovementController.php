@@ -53,7 +53,7 @@ class MovementController extends Controller
                 "status" => "ok",
             ]);
         } catch (\Throwable $th) {
-            Log::error("MovementController store " . jsonLog($th));
+            Log::error($th);
             return response()->json([
                 "status" => "error",
             ]);
