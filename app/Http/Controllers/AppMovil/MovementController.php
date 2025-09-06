@@ -79,9 +79,19 @@ class MovementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(string $id, Request $request)
     {
-        //
+        Log::info("MovementService update " . jsonLog($request->movement_id));
+        try {
+            $this->movementService->updateMovement($request->movement_id);
+            return response()->json([
+                "status" => "ok",
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => "error",
+            ]);
+        }
     }
 
     /**

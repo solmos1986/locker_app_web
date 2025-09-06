@@ -11,4 +11,4 @@ Route::get('/auth', function (Request $request) {
 
 Route::get('/database', [DatabaseController::class, 'index']);
 Route::post('/movement', [MovementController::class, 'store']);
-Route::put('/movement', [MovementController::class, 'update']);
+Route::put('/movement/{id}', [MovementController::class, 'update']);

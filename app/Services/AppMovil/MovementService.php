@@ -86,7 +86,6 @@ class MovementService
             Log::info("MovementService storeMovement error al notificar al servidor");
         }
 
-        //Log::info("MovementService storeMovement insert " . jsonLog($insert));
     }
 
     public function updateMovement($movement_id)
@@ -97,5 +96,47 @@ class MovementService
             ->update([
                 "delivered" => 1,
             ]);
+        $movement = DB::table('movement')->where('movement_id', $movement_id)
+            ->first();
+
+        $data = [
+            "id"              => $movement->id_ref,
+            "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
+            "size"            => "medium",
+            "deliveryToken"   => $movement->code,
+            "externalOrderId" => "delivery",
+            "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
+            "collectToken"    => $movement->code,
+            "status"          => "collected",
+            "senderId"        => "delivery",
+            "receiverId"      => "905",
+            "activate"        => true,
+            "collected"       => true,
+            "delivered"       => true,
+        ];
+        Log::info("MovementService storeMovement set enviar server  " . jsonLog(env("URL_APP_EXPERIENCE") . "/api/lockers-v1"));
+        Log::info("MovementService storeMovement set data  " . jsonLog($data));
+        Log::info("MovementService storeMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
+        $client = new \GuzzleHttp\Client();
+        try {
+            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json',
+                ],
+                'body'    => json_encode($data),
+            ]);
+            Log::info("MovementService storeMovement status " . jsonLog($response->getStatusCode()));
+            Log::info("MovementService storeMovement response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
+            $update = DB::table('movement')
+                ->where('movement_id', $movement_id)->update([
+                "send_completed" => 1,
+            ]);
+            Log::info("MovementService movimiento modificado " . jsonLog($update));
+        } catch (\Throwable $th) {
+            Log::error($th);
+            Log::info("MovementService storeMovement error al notificar al servidor");
+        }
     }
 }
