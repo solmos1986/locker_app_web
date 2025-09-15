@@ -13,11 +13,38 @@ class LockerController extends Controller
     {
         $this->lockerService = $lockerService;
     }
+    
     public function dataTable()
     {
         Log::info("LockerController dataTable ");
         $lockers = $this->lockerService->getLockers();
         return DataTables::of($lockers)->make(true);
+    }
+
+    public function getStatus(Request $request)
+    {
+        Log::info("LockerController getStatus ");
+        try {
+            $locker = $this->lockerService->getLockerStatus($request->locker_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get locker',
+                ],
+                'data' => $locker,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
     /**
      * Display a listing of the resource.

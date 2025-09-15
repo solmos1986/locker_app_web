@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
@@ -11,12 +10,41 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
+    protected $dashboardService;
+    public function __construct(DashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
+    }
+
+    public function info()
+    {
+        Log::info("DashboardController info ");
+        try {
+            $info = $this->dashboardService->info();
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get dashboard',
+                ],
+                'data' => $info,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
     public function index()
     {
-        Log::info("DashboardController rol " . jsonLog(Auth::user()->getCurrentRol));
-        Log::info("DashboardController session " . jsonLog(session('client_id')));
-        Log::info("DashboardController cliente " . jsonLog(Auth::user()->getClient));
-        return view('pages.dashboard.index');
+
     }
 
     /**

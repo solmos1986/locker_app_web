@@ -148,12 +148,7 @@ VALUES (1, '905');
 INSERT INTO
     `user` (`client_id`, `name`)
 VALUES (1, '906');
-INSERT INTO
-    `controller` (`locker_id`, `address485`)
-VALUES (1, 'x434'),
-    (1, 'x464'),
-    (1, 'x334');
-
+UPDATE door SET state=0  WHERE door.door_id=15;
 INSERT INTO
     `door_size` (`name`)
 VALUES ('Pequeño'),

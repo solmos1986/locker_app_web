@@ -1,21 +1,102 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Services\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    protected $loginService;
+    public function __construct(LoginService $loginService)
+    {
+        $this->loginService = $loginService;
+    }
     /**
      * Display a listing of the resource.
      */
+
+    public function login(Request $request)
+    {
+        Log::info("AuthController/login " . jsonLog($request->all()));
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $empresa = $this->loginService->getCLientDefault($user->id);
+
+            $customClaims = ['client_id' => $empresa->client_id];
+            Log::info("AuthController/login customClaims " . jsonLog([$user, $customClaims]));
+            $token = JWTAuth::customClaims($customClaims)->fromUser($user, $customClaims);
+            Log::info("AuthController/login regenerateToken " . jsonLog($token));
+        } else {
+            return response()->json([
+                'meta' => [
+                    'code'    => 401,
+                    'status'  => 'Error',
+                    'message' => 'Datos invalidos',
+                ],
+                'data' => null,
+            ]);
+        }
+
+        try {
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Bienvenido',
+                ],
+                'data' => [
+                    'user'  => $user,
+                    'token' => $token,
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
     public function logout()
     {
         Log::info("AuthController logout " . jsonLog(Auth::user()));
         Auth::logout();
         return view('pages.auth.login');
+    }
+
+    public function getUser(Request $request)
+    {
+        Log::info("AuthController/getUser " . jsonLog($request->all()));
+        try {
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Usuario valido',
+                ],
+                'data' => Auth::user(),
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
     /**
      * Display a listing of the resource.
