@@ -5,6 +5,7 @@ use App\Http\Controllers\AppMovil\MovementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LockerController;
+use App\Http\Controllers\MovementController as ControllersMovementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/database', [DatabaseController::class, 'index']);
@@ -17,6 +18,10 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::prefix('locker')->group(function () {
         Route::post('/data-table', [LockerController::class, 'dataTable'])->name('configurations.locker.data-table');
+        Route::post('/get-status', [LockerController::class, 'getStatus'])->name('configurations.locker.get-status');
+    });
+    Route::prefix('movement')->group(function () {
+        Route::post('/data-table', [ControllersMovementController::class, 'dataTable'])->name('configurations.locker.data-table');
         Route::post('/get-status', [LockerController::class, 'getStatus'])->name('configurations.locker.get-status');
     });
 

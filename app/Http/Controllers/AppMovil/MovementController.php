@@ -47,7 +47,7 @@ class MovementController extends Controller
         try {
             $this->databaseService->GetDataBase();
             //$this->movementAppMovilService->storeMovement($request->user_id, $request->door_id, $request->code);
-            $this->movementService->storeMovement($request->user_id, $request->door_id, $request->code);
+            $this->movementService->storeMovement($request->department_id, $request->door_id, $request->code, $request->id_ref);
 
             return response()->json([
                 "status" => "ok",

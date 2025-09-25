@@ -13,17 +13,35 @@ class LockerService
     public function getLockerStatus($locker_id)
     {
         Log::info("LockerService getLockerStatus " . jsonLog($locker_id));
+        $movements = DB::table('movement')
+            ->select('movement.*')
+            ->join('door', 'door.door_id', 'movement.door_id')
+            ->join('controller', 'controller.controller_id', 'door.controller_id')
+            ->where('controller.locker_id', $locker_id)
+            ->where('movement.client_id', getUser()->get('client_id'))
+            ->get();
+
+        $depataments = DB::table('department')
+            ->select('department.*')
+            ->where('department.client_id', getUser()->get('client_id'))
+            ->get();
         $locker = DB::table('locker')
             ->select(
                 'locker.locker_id',
                 'locker.macAdd',
+                'locker.name',
+                'locker.address',
                 'locker.state',
             )
             ->where('locker.locker_id', $locker_id)
         //->where('locker.client_id', Auth::user()->getClient->client_id)
             ->first();
         $locker->doors = $this->getDoors($locker_id);
-        return $locker;
+        return [
+            'locker'      => $locker,
+            'depataments' => $depataments,
+            'movements'   => $movements,
+        ];
     }
 
     private function getDoors($locker_id)

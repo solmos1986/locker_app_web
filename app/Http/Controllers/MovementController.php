@@ -1,11 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Services\AppMovil\MovementAppMovilService;
 use App\Services\MovementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
 
 class MovementController extends Controller
 {
@@ -16,11 +14,36 @@ class MovementController extends Controller
         $this->movementService = $movementService;
     }
 
-    public function dataTable()
+    public function dataTable(Request $request)
     {
-        Log::info("MovementController dataTable ");
-        $movements = $this->movementService->getMovimientos();
-        return DataTables::of($movements)->make(true);
+        Log::info("MovementController dataTable " . jsonLog($request->all()));
+
+        try {
+            $pageSize  = is_null($request->pageSize) ? 100 : $request->pageSize;
+            $active    = is_null($request->active) ? "id_empresa" : $request->active;
+            $direction = is_null($request->direction) ? "ASC" : $request->direction;
+            $pageIndex = is_null($request->pageIndex) ? 0 : $request->pageIndex;
+            $search    = is_null($request->search) ? '' : $request->search;
+            $movements = $this->movementService->dataTable($pageSize, $pageIndex, $active, $direction, $search);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $movements,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
     /**
      * Display a listing of the resource.

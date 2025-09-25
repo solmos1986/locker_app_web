@@ -1,43 +1,59 @@
 <?php
 namespace App\Services;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use stdClass;
 
 class MovementService
 {
     public function __construct()
     {}
 
-    public function getMovimientos()
+    public function dataTable($pageSize, $pageIndex, $active, $direction, $search)
     {
-        Log::info("MovementService getMovimientos " . jsonLog([]));
-        Log::info("MovementService user " . jsonLog(Auth::user()->getCurrentRol));
-        Log::info("MovementService VerificateRol " . jsonLog(VerificateRol('admin')));
+        Log::info("MovementService dataTable " . jsonLog([$pageSize, $pageIndex, $active, $direction, $search]));
+        $dataTable = new stdClass();
         $movements = DB::table('movement')
             ->select(
                 'movement.movement_id',
-                'user.name as resident',
-                'door.number as department',
+                'department.name as department',
+                'door.number as casillero',
                 'movement.code',
-                'movement.create_at',
-                'movement.delivered',
+                'movement.id_ref',
+                'movement.status_integrate',
+                'movement.status_notificate',
+                'type_movement.name as state',
+                'movement.create_at'
             )
             ->join('door', 'door.door_id', 'movement.door_id')
-            ->join('user', 'user.user_id', 'movement.user_id')
-            ->where('movement.client_id', Auth::user()->getClient->client_id)
-            ->get();
-        return $movements;
+            ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
+            ->join('department', 'department.department_id', 'movement.department_id')
+            ->where('movement.client_id', getUser()->get('client_id'))
+            ->orderBy($active, $direction)
+            ->paginate($pageSize);
+
+        Log::info("MovementService dataTable movements " . jsonLog($movements->items()));
+        $dataTable->paginate = [
+            'length'    => $movements->count(),
+            'pageIndex' => $pageIndex,
+            'pageSize'  => $pageSize,
+        ];
+        $dataTable->sort = [
+            'active'    => $active,
+            'direction' => $direction,
+        ];
+        $dataTable->movements = $movements->items();
+        return $dataTable;
     }
 
     public function storeMovement($user_id, $door_id, $code)
     {
-        Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code, Auth::user()->getClient->client_id]));
+        Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code, getUser()->get('client_id')]));
         $insert = DB::table('movement')->insert([
             "user_id"   => $user_id,
             "door_id"   => $door_id,
-            "client_id" => Auth::user()->getClient->client_id,
+            "client_id" => getUser()->get('client_id'),
             "code"      => $code,
         ]);
         Log::info("MovementService storeMovement insert " . jsonLog($insert));

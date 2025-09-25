@@ -12,25 +12,34 @@ class DashboardService
     public function info()
     {
         Log::info("DashboardService info " . jsonLog([]));
-        $users = DB::table('user')
-            ->where('user.client_id', getUser()->get('client_id'))
-            ->get();
         $lockers = DB::table('locker')
             ->select(
                 'locker.locker_id',
+                'locker.name',
                 'locker.address'
             )
             ->join('controller', 'controller.locker_id', 'locker.locker_id')
             ->where('locker.client_id', getUser()->get('client_id'))
             ->groupBy('locker.locker_id', 'locker.address')
             ->get();
-        $movements = DB::table('movement')
-            ->where('movement.client_id', getUser()->get('client_id'))
-            ->get();
+
+        foreach ($lockers as $key => $locker) {
+            $locker->doors = DB::table('controller')
+                ->select(
+                    'door.door_id',
+                    'door.door_size_id',
+                    'door.controller_id',
+                    'door.number',
+                    'door.channel',
+                    'door.orden',
+                    'door.state',
+                )
+                ->join('door', 'door.controller_id', 'controller.controller_id')
+                ->where('controller.locker_id', $locker->locker_id)
+                ->get();
+        }
         return [
-            'users'   => $users,
             'lockers' => $lockers,
-            'movements' => $movements,
         ];
     }
 

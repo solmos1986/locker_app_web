@@ -34,19 +34,20 @@ class MovementService
         return $movements;
     }
 
-    public function storeMovement($user_id, $door_id, $code)
+    public function storeMovement($department_id, $door_id, $code, $id_ref)
     {
-        Log::info("MovementService storeMovement " . jsonLog([$user_id, $door_id, $code]));
+        Log::info("MovementService storeMovement " . jsonLog([$department_id, $door_id, $code, $id_ref]));
         $id          = Str::uuid();
         $movement_id = DB::table('movement')->insertGetId([
-            "user_id"   => $user_id,
-            "door_id"   => $door_id,
-            "id_ref"    => $id,
-            "client_id" => 1,
-            "code"      => $code,
+            "department_id"    => $department_id,
+            "door_id"          => $door_id,
+            "id_ref"           => $id_ref,
+            "client_id"        => 1,
+            "code"             => $code,
+            "type_movement_id" => 1,
         ]);
         $movement = DB::table('movement')
-            ->join('user', 'movement.user_id', 'user.user_id')
+            ->join('department', 'department.department_id', 'movement.department_id')
             ->where('movement.movement_id', $movement_id)
             ->first();
         $data = [
@@ -68,7 +69,7 @@ class MovementService
         Log::info("MovementService storeMovement set data  " . jsonLog($data));
         Log::info("MovementService storeMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
         $client = new \GuzzleHttp\Client();
-        try {
+       /*  try {
             $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
@@ -87,7 +88,7 @@ class MovementService
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService storeMovement error al notificar al servidor");
-        }
+        } */
 
     }
 
