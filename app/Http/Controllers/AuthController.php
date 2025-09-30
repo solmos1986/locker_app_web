@@ -22,28 +22,25 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         Log::info("AuthController/login " . jsonLog($request->all()));
-
-        $user = User::where('email', $request->email)->first();
-
-        if ($user) {
-            $empresa = $this->loginService->getCLientDefault($user->id);
-
-            $customClaims = ['client_id' => $empresa->client_id];
-            Log::info("AuthController/login customClaims " . jsonLog([$user, $customClaims]));
-            $token = JWTAuth::customClaims($customClaims)->fromUser($user, $customClaims);
-            Log::info("AuthController/login regenerateToken " . jsonLog($token));
-        } else {
-            return response()->json([
-                'meta' => [
-                    'code'    => 401,
-                    'status'  => 'Error',
-                    'message' => 'Datos invalidos',
-                ],
-                'data' => null,
-            ]);
-        }
-
         try {
+            $user = User::where('email', $request->email)->first();
+            if ($user) {
+                $empresa = $this->loginService->getCLientDefault($user->id);
+
+                $customClaims = ['client_id' => $empresa->client_id];
+                Log::info("AuthController/login customClaims " . jsonLog([$user, $customClaims]));
+                $token = JWTAuth::customClaims($customClaims)->fromUser($user, $customClaims);
+                Log::info("AuthController/login regenerateToken " . jsonLog($token));
+            } else {
+                return response()->json([
+                    'meta' => [
+                        'code'    => 401,
+                        'status'  => 'Error',
+                        'message' => 'Datos invalidos',
+                    ],
+                    'data' => null,
+                ]);
+            }
             return response()->json([
                 'meta' => [
                     'code'    => 200,
@@ -51,7 +48,8 @@ class AuthController extends Controller
                     'message' => 'Bienvenido',
                 ],
                 'data' => [
-                    'user'  => $user,
+                    "auth"  => $user,
+                    "rol"   => $user->getCurrentRol,
                     'token' => $token,
                 ],
             ]);
@@ -86,9 +84,8 @@ class AuthController extends Controller
                 ],
                 'data' => [
                     "auth" => Auth::user(),
-                    "rol"  => Auth::user()->getCurrentRol
+                    "rol"  => Auth::user()->getCurrentRol,
                 ],
-
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
