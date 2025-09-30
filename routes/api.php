@@ -19,6 +19,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('locker')->group(function () {
         Route::post('/data-table', [LockerController::class, 'dataTable'])->name('configurations.locker.data-table');
         Route::post('/get-status', [LockerController::class, 'getStatus'])->name('configurations.locker.get-status');
+        
     });
     Route::prefix('movement')->group(function () {
         Route::post('/data-table', [ControllersMovementController::class, 'dataTable'])->name('configurations.locker.data-table');

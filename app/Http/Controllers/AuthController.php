@@ -84,7 +84,11 @@ class AuthController extends Controller
                     'status'  => 'success',
                     'message' => 'Usuario valido',
                 ],
-                'data' => Auth::user(),
+                'data' => [
+                    "auth" => Auth::user(),
+                    "rol"  => Auth::user()->getCurrentRol
+                ],
+
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
