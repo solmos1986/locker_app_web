@@ -29,9 +29,8 @@ class DashboardService
                     'door.door_id',
                     'door.door_size_id',
                     'door.controller_id',
-                    'door.number',
-                    'door.channel',
-                    'door.orden',
+                    'door.name',
+                    'door.order',
                     'door.state',
                 )
                 ->join('door', 'door.controller_id', 'controller.controller_id')

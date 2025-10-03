@@ -13,7 +13,7 @@ class LockerController extends Controller
     {
         $this->lockerService = $lockerService;
     }
-    
+
     public function dataTable()
     {
         Log::info("LockerController dataTable ");
@@ -33,6 +33,32 @@ class LockerController extends Controller
                     'message' => 'Get locker',
                 ],
                 'data' => $locker,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
+    public function requirement(Request $request)
+    {
+        Log::info("LockerController requirement " . jsonLog($request->all()));
+        try {
+            $requirement = $this->lockerService->getRequirement();
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get locker',
+                ],
+                'data' => $requirement,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
@@ -68,7 +94,33 @@ class LockerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Log::info("LockerController store " . jsonLog($request->all()));
+        try {
+            $locker = $this->lockerService->storeLocker(
+                $request->locker_id,
+                $request->name,
+                $request->address,
+                $request->type_locker_id
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Registrado correctamente',
+                ],
+                'data' => $locker,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -84,7 +136,28 @@ class LockerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        Log::info("LockerController edit " . jsonLog($id));
+        try {
+            $locker = $this->lockerService->editLocker($id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Datos obtenidos correctamente',
+                ],
+                'data' => $locker,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -92,7 +165,33 @@ class LockerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Log::info("LockerController update " . jsonLog($id));
+        try {
+            $locker = $this->lockerService->updateLocker(
+                $request->locker_id,
+                $request->name,
+                $request->address,
+                $request->type_locker_id
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Modificado correctamente',
+                ],
+                'data' => $locker,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -100,6 +199,27 @@ class LockerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Log::info("LockerController destroy " . jsonLog($id));
+        try {
+            // $locker = $this->lockerService->editLocker($id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Eliminado correctamente',
+                ],
+                'data' => null,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 }

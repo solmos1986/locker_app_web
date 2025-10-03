@@ -28,7 +28,6 @@ class LockerService
         $locker = DB::table('locker')
             ->select(
                 'locker.locker_id',
-                'locker.macAdd',
                 'locker.name',
                 'locker.address',
                 'locker.state',
@@ -50,10 +49,9 @@ class LockerService
         $doors = DB::table('controller')
             ->select(
                 'door.door_id',
-                'door.number',
+                'door.name',
                 'door.state',
-                'door.orden',
-                'door.channel',
+                'door.order',
                 'door_size.door_size_id',
                 'door_size.name as name_size',
             )
@@ -64,6 +62,18 @@ class LockerService
             ->get();
         Log::info("LockerService getDoors => " . jsonLog($doors));
         return $doors;
+    }
+
+    public function getRequirement()
+    {
+        Log::info("LockerService getRequirement " . jsonLog([]));
+        /* $size_door  = DB::table('door_size')->get();
+        $controller = DB::table('controller')->where('controller.',getUser()->get('client_id'))->get(); */
+        $type_lockers = DB::table('type_locker')->get();
+        //type_locker
+        return [
+            'type_lockers' => $type_lockers,
+        ];
     }
 
     public function getLockers()
@@ -80,12 +90,18 @@ class LockerService
         return $users;
     }
 
-    public function storeLocker($macAdd)
-    {
-        Log::info("LockerService storeLocker " . jsonLog($macAdd));
-        $insert = DB::table('locker')->insert([
-            "macAdd"    => $macAdd,
-            "client_id" => Auth::user()->getClient->client_id,
+    public function storeLocker(
+        $locker_id,
+        $name,
+        $address,
+        $type_locker_id
+    ) {
+        Log::info("LockerService storeLocker " . jsonLog([$name, $address, $type_locker_id]));
+        $insert = DB::table('locker')->insertGetId([
+            'client_id'      => getUser()->get('client_id'),
+            'type_locker_id' => $type_locker_id,
+            'name'           => $name,
+            'address'        => $address,
         ]);
         return $insert;
     }
@@ -93,19 +109,31 @@ class LockerService
     public function editLocker($locker_id)
     {
         Log::info("LockerService editLocker " . jsonLog($locker_id));
-        $user = DB::table('locker')->where(
-            "locker_id", $locker_id);
-        return $user;
+        $locker = DB::table('locker')
+            ->select(
+                'locker.locker_id',
+                'locker.name',
+                'locker.address',
+                'locker.type_locker_id',
+                'locker.state',
+            )
+            ->where(
+                "locker_id", $locker_id)
+            ->first();
+        return $locker;
     }
 
-    public function updateLocker($macAdd)
+    public function updateLocker($locker_id, $name, $address, $type_locker_id)
     {
-        Log::info("LockerService updateUser " . jsonLog($macAdd));
-        $insert = DB::table('locker')->insert([
-            "macAdd"    => $macAdd,
-            "client_id" => Auth::user()->getClient->client_id,
+        Log::info("LockerService updateLocker " . jsonLog([$name, $address, $type_locker_id]));
+        $update = DB::table('locker')
+            ->where('locker.locker_id', $locker_id)->update([
+            'type_locker_id' => $type_locker_id,
+            'name'           => $name,
+            'address'        => $address,
         ]);
-        return $insert;
+        $update = $this->editLocker($locker_id);
+        return $update;
     }
 
     public function deleteLocker($locker_id)
@@ -114,6 +142,7 @@ class LockerService
         $delete = DB::table('locker')->where(
             "locker_id", $locker_id)
             ->delete();
+
         return $delete;
     }
 }
