@@ -20,7 +20,7 @@ class DashboardService
             )
             ->join('controller', 'controller.locker_id', 'locker.locker_id')
             ->where('locker.client_id', getUser()->get('client_id'))
-            ->groupBy('locker.locker_id', 'locker.address')
+            ->groupBy('locker.locker_id', 'locker.address','locker.name')
             ->get();
 
         foreach ($lockers as $key => $locker) {
