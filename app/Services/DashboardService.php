@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use function Laravel\Prompts\select;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -20,9 +21,17 @@ class DashboardService
             )
             ->join('controller', 'controller.locker_id', 'locker.locker_id')
             ->where('locker.client_id', getUser()->get('client_id'))
-            ->groupBy('locker.locker_id', 'locker.address','locker.name')
+            ->groupBy('locker.locker_id', 'locker.address', 'locker.name')
             ->get();
 
+        $user = DB::table('users')
+            ->select(
+                'id',
+                'name',
+                'email',
+                'celular',
+            )
+            ->get();
         foreach ($lockers as $key => $locker) {
             $locker->doors = DB::table('controller')
                 ->select(
@@ -39,6 +48,7 @@ class DashboardService
         }
         return [
             'lockers' => $lockers,
+            'users'   => $user,
         ];
     }
 

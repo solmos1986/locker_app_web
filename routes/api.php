@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoorController;
 use App\Http\Controllers\LockerController;
 use App\Http\Controllers\MovementController as ControllersMovementController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/database', [DatabaseController::class, 'index']);
@@ -27,9 +28,17 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('{id}', [LockerController::class, 'destroy'])->name('configurations.locker.destroy');
     });
 
+    Route::prefix('user')->group(function () {
+        Route::post('/data-table', [UsersController::class, 'dataTable'])->name('configurations.user.data-table');
+        Route::get('/requeriment', [UsersController::class, 'requeriment'])->name('configurations.user.requeriment');
+        Route::post('', [UsersController::class, 'store'])->name('configurations.user.store');
+        Route::get('{id}', [UsersController::class, 'edit'])->name('configurations.user.edit');
+        Route::put('{id}', [UsersController::class, 'update'])->name('configurations.user.update');
+        Route::delete('{id}', [UsersController::class, 'destroy'])->name('configurations.user.destroy');
+    });
+
     Route::prefix('controller')->group(function () {
         Route::post('/data-table', [ControllerController::class, 'dataTable'])->name('configurations.controller.data-table');
-
     });
 
     Route::prefix('door')->group(function () {
@@ -39,7 +48,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('{id}', [DoorController::class, 'edit'])->name('configurations.door.edit');
         Route::put('{id}', [DoorController::class, 'update'])->name('configurations.door.update');
         Route::delete('{id}', [DoorController::class, 'destroy'])->name('configurations.door.destroy');
-
     });
 
     Route::prefix('locker')->group(function () {

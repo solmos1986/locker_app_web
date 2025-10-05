@@ -83,14 +83,14 @@ class DoorService
             $door_id,
         ]));
         $door = DB::table('door')
-        ->select(
-            'door.door_id',
-            'door.door_size_id',
-            'door.controller_id',
-            'door.name',
-            'door.state',
-            'door.order',
-        )
+            ->select(
+                'door.door_id',
+                'door.door_size_id',
+                'door.controller_id',
+                'door.name',
+                'door.state',
+                'door.order',
+            )
             ->where('door_id', $door_id)
             ->first();
         return $door;
