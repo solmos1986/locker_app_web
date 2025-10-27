@@ -18,7 +18,7 @@ class MovementService
             ->select(
                 'movement.movement_id',
                 'department.name as department',
-                'door.number as casillero',
+                'door.name as casillero',
                 'movement.code',
                 'movement.id_ref',
                 'movement.status_integrate',
@@ -29,7 +29,7 @@ class MovementService
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
             ->join('department', 'department.department_id', 'movement.department_id')
-            ->where('movement.client_id', getUser()->get('client_id'))
+            ->where('movement.building_id', 1) //getUser()->get('client_id')
             ->orderBy($active, $direction)
             ->paginate($pageSize);
 

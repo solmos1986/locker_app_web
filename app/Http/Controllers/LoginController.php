@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Services\LoginService;
@@ -35,11 +34,13 @@ class LoginController extends Controller
         //$new_password = Hash::make($request->password);
 
         if (Auth::attempt([
-            'email' => $request->email,
+            'email'    => $request->email,
             'password' => $request->password,
         ])) {
-            $empresa = $this->loginService->getCLientDefault(Auth::user()->id);
-            $request->session()->put('client_id', $empresa->client_id);
+            $company = $this->loginService->getCompany(Auth::user()->id);
+            $getRolesBuilding = $this->loginService->getRolesBuilding(Auth::user()->id);
+            $request->session()->put('company_id', $company->company_id);
+            //$request->session()->put('rol', $getRolesBuilding->company_id);
             $request->session()->regenerate();
             return redirect()->route('dashboard.index');
         }
@@ -48,7 +49,6 @@ class LoginController extends Controller
             'email' => 'Correo no valido.',
         ])->onlyInput('email');
     }
-
 
     /**
      * Show the form for creating a new resource.

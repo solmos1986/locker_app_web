@@ -26,7 +26,7 @@ class DoorService
             ->orderBy($active, $direction)
             ->paginate($pageSize);
 
-        Log::info("MovementService dataTable movements " . jsonLog($doors->items()));
+        Log::info("DoorService dataTable movements " . jsonLog($doors->items()));
         $dataTable->paginate = [
             'length'    => $doors->count(),
             'pageIndex' => $pageIndex,

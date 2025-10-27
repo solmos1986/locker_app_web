@@ -37,19 +37,23 @@ class MovementService
     public function storeMovement($department_id, $door_id, $code, $id_ref)
     {
         Log::info("MovementService storeMovement " . jsonLog([$department_id, $door_id, $code, $id_ref]));
+        Log::info("MovementService storeMovement getLocker " . jsonLog(getLocker()));
+
         $id          = Str::uuid();
         $movement_id = DB::table('movement')->insertGetId([
             "department_id"    => $department_id,
             "door_id"          => $door_id,
             "id_ref"           => $id_ref,
-            "client_id"        => 1,
+            "building_id"      => getLocker()->get('building_id'),
             "code"             => $code,
             "type_movement_id" => 1,
         ]);
+
         $movement = DB::table('movement')
             ->join('department', 'department.department_id', 'movement.department_id')
             ->where('movement.movement_id', $movement_id)
             ->first();
+
         $data = [
             "id"              => $id,
             "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
@@ -69,7 +73,7 @@ class MovementService
         Log::info("MovementService storeMovement set data  " . jsonLog($data));
         Log::info("MovementService storeMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
         $client = new \GuzzleHttp\Client();
-       /*  try {
+        /*  try {
             $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),

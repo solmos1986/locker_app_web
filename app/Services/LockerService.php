@@ -18,13 +18,14 @@ class LockerService
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('controller', 'controller.controller_id', 'door.controller_id')
             ->where('controller.locker_id', $locker_id)
-            ->where('movement.client_id', getUser()->get('client_id'))
+            ->where('movement.building_id', 1) //getUser()->get('client_id')
             ->get();
 
         $depataments = DB::table('department')
             ->select('department.*')
-            ->where('department.client_id', getUser()->get('client_id'))
+            ->where('department.building_id', 1)
             ->get();
+
         $locker = DB::table('locker')
             ->select(
                 'locker.locker_id',
@@ -33,13 +34,28 @@ class LockerService
                 'locker.state',
             )
             ->where('locker.locker_id', $locker_id)
-        //->where('locker.client_id', Auth::user()->getClient->client_id)
             ->first();
+
+        $building = DB::table('building')
+            ->select(
+                'building.building_id',
+                'building.company_id',
+                'building.name',
+                'building.phone',
+                'building.manager',
+                'building.address',
+                'building.code'
+            )
+            ->join('locker', 'locker.building_id', 'building.building_id')
+            ->where('locker.locker_id', $locker_id)
+            ->first();
+
         $locker->doors = $this->getDoors($locker_id);
         return [
             'locker'      => $locker,
             'depataments' => $depataments,
             'movements'   => $movements,
+            'building'    => $building,
         ];
     }
 

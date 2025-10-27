@@ -13,6 +13,8 @@ class DashboardService
     public function info()
     {
         Log::info("DashboardService info " . jsonLog([]));
+        Log::info("DashboardService getUser " . jsonLog(getUser()));
+
         $lockers = DB::table('locker')
             ->select(
                 'locker.locker_id',
@@ -20,7 +22,7 @@ class DashboardService
                 'locker.address'
             )
             ->join('controller', 'controller.locker_id', 'locker.locker_id')
-            ->where('locker.client_id', getUser()->get('client_id'))
+            ->where('locker.building_id', 1)
             ->groupBy('locker.locker_id', 'locker.address', 'locker.name')
             ->get();
 

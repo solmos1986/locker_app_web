@@ -41,21 +41,29 @@ class MovementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function pending(Request $request)
     {
-        Log::info("MovementController AppMovil store " . jsonLog($request->all()));
-        try {
-            $this->databaseService->GetDataBase();
-            //$this->movementAppMovilService->storeMovement($request->user_id, $request->door_id, $request->code);
-            $this->movementService->storeMovement($request->department_id, $request->door_id, $request->code, $request->id_ref);
+        Log::info("MovementController AppMovil pending " . jsonLog($request->all()));
 
+        try {
+            $this->movementService->storeMovement($request->department_id, $request->door_id, $request->code, $request->id_ref);
             return response()->json([
-                "status" => "ok",
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'OK',
+                    'message' => 'Guardado correctamente',
+                ],
+                'data' => null,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
             return response()->json([
-                "status" => "error",
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
             ]);
         }
     }
@@ -79,17 +87,29 @@ class MovementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(string $id, Request $request)
+    public function received(string $id, Request $request)
     {
-        Log::info("MovementService update " . jsonLog($request->movement_id));
+        Log::info("MovementService received " . jsonLog($request->movement_id));
+
         try {
             $this->movementService->updateMovement($request->movement_id);
             return response()->json([
-                "status" => "ok",
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'OK',
+                    'message' => 'Guardado correctamente',
+                ],
+                'data' => null,
             ]);
         } catch (\Throwable $th) {
+            Log::error($th);
             return response()->json([
-                "status" => "error",
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
             ]);
         }
     }

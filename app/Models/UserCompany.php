@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
-class UserClient extends Model
+class UserCompany extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -19,10 +19,10 @@ class UserClient extends Model
      *
      * @var list<string>
      */
-    protected $table = 'user_client';
-    protected $primaryKey = 'user_client_id';
+    protected $table = 'user_company';
+    protected $primaryKey = 'user_company_id';
     protected $fillable = [
-        'client_id',
+        'company_id',
         'user_id'
     ];
     

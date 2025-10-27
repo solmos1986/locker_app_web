@@ -25,9 +25,10 @@ class AuthController extends Controller
         try {
             $user = User::where('email', $request->email)->first();
             if ($user) {
-                $empresa = $this->loginService->getCLientDefault($user->id);
-
-                $customClaims = ['client_id' => $empresa->client_id];
+                $company      = $this->loginService->getCompany($user->id);
+                $customClaims = [
+                    'company_id' => $company->company_id,
+                ];
                 Log::info("AuthController/login customClaims " . jsonLog([$user, $customClaims]));
                 $token = JWTAuth::customClaims($customClaims)->fromUser($user, $customClaims);
                 Log::info("AuthController/login regenerateToken " . jsonLog($token));
@@ -48,9 +49,10 @@ class AuthController extends Controller
                     'message' => 'Bienvenido',
                 ],
                 'data' => [
-                    "auth"  => $user,
-                    "rol"   => $user->getCurrentRol,
-                    'token' => $token,
+                    "auth"    => $user,
+                    "rol"     => $user->getCurrentRol,
+                    "company" => $company,
+                    'token'   => $token,
                 ],
             ]);
         } catch (\Throwable $th) {
@@ -76,6 +78,7 @@ class AuthController extends Controller
     {
         Log::info("AuthController/getUser " . jsonLog($request->all()));
         try {
+            $company = $this->loginService->getCompany(Auth::user()->id);
             return response()->json([
                 'meta' => [
                     'code'    => 200,
@@ -83,8 +86,9 @@ class AuthController extends Controller
                     'message' => 'Usuario valido',
                 ],
                 'data' => [
-                    "auth" => Auth::user(),
-                    "rol"  => Auth::user()->getCurrentRol,
+                    "auth"    => Auth::user(),
+                    "rol"     => Auth::user()->getCurrentRol,
+                    "company" => $company,
                 ],
             ]);
         } catch (\Throwable $th) {

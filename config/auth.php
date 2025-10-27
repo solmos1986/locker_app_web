@@ -36,13 +36,18 @@ return [
     */
 
     'guards'           => [
-        'web' => [
+        'web'    => [
             'driver'   => 'session',
             'provider' => 'users',
         ],
-        'api' => [
+        'api'    => [
             'driver'   => 'jwt',
             'provider' => 'users',
+            'hash'     => false,
+        ],
+        'locker' => [
+            'driver'   => 'jwt',
+            'provider' => 'locker',
             'hash'     => false,
         ],
     ],
@@ -69,7 +74,10 @@ return [
             'driver' => 'eloquent',
             'model'  => env('AUTH_MODEL', App\Models\User::class),
         ],
-
+        'locker' => [
+            'driver' => 'eloquent',
+            'model'  => env('AUTH_MODEL', App\Models\Locker::class),
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

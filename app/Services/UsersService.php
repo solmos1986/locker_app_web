@@ -56,8 +56,20 @@ class UsersService
                 'name'
             )
             ->get();
+        $buildings = DB::table('building')
+            ->select(
+                'building.building_id',
+                'building.company_id',
+                'building.name',
+                'building.address',
+                'building.phone',
+                'building.manager',
+                'building.code'
+            )
+            ->get();
         return [
-            'roles' => $roles,
+            'roles'     => $roles,
+            'buildings' => $buildings,
         ];
     }
     public function storeUser(
@@ -114,9 +126,21 @@ class UsersService
                 'users.email',
                 'users.celular',
             )->first();
+
+        $buildings = DB::table('building')
+            ->select(
+                'building.building_id'
+            )
+            ->join('users_rol_building', 'building.building_id', 'users_rol_building.building_id')
+            ->join('users_rol', 'users_rol.users_rol_id', 'users_rol_building.users_rol_id')
+            ->where('users_rol.users_id', $id)
+            ->get()
+            ->pluck('building_id');
+
         $user->reset_password = false;
         $user->roles          = explode(',', $user->roles);
         $user->roles          = array_map('intval', $user->roles);
+        $user->buildings      = $buildings;
         return $user;
     }
     public function updateUser(

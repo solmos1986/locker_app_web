@@ -22,7 +22,6 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
     ];
-    private $client_id = "test";
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -55,14 +54,15 @@ class User extends Authenticatable implements JWTSubject
         return $roles;
     }
 
-    public function getClient()
+    public function getCompany()
     {
-        $client = $this->hasOne(UserClient::class)
-            ->select('client.*')
-            ->join('client', 'client.client_id', 'user_client.client_id')
-            ->where('user_client.client_id', session('client_id')) /* ->toSql() */;
+        $company = $this->hasOne(UserCompany::class, 'users_id')
+            ->select('user_company.*')
+            //->join('company', 'company.company_id', 'user_company.company_id')
+            ->join('user_company', 'user_company.users_id', 'company.users_id')
+            ->where('user_company.users_id', $this->id) /* ->toSql() */;
         /* dd($client, session('client_id')); */
-        return $client;
+        return $$company;
     }
 
     /**

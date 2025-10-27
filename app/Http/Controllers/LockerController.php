@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use App\Services\LockerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
 
 class LockerController extends Controller
 {
@@ -14,11 +13,31 @@ class LockerController extends Controller
         $this->lockerService = $lockerService;
     }
 
-    public function dataTable()
+    public function getDashBoardBuilder(Request $request)
     {
         Log::info("LockerController dataTable ");
-        $lockers = $this->lockerService->getLockers();
-        return DataTables::of($lockers)->make(true);
+
+        try {
+            $info = $this->lockerService->bluildingStatus($request->building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get locker',
+                ],
+                'data' => $info,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     public function getStatus(Request $request)

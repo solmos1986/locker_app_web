@@ -17,7 +17,6 @@ class MovementController extends Controller
     public function dataTable(Request $request)
     {
         Log::info("MovementController dataTable " . jsonLog($request->all()));
-
         try {
             $pageSize  = is_null($request->pageSize) ? 100 : $request->pageSize;
             $active    = is_null($request->active) ? "id_empresa" : $request->active;

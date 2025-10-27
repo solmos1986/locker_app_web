@@ -41,8 +41,17 @@ if (! function_exists('sizeDoor')) {
         return env('SIZE_DOOR_SMALL');
     }
 }
+
 if (! function_exists('getUser')) {
     function getUser()
+    {
+        JWTAuth::parseToken()->authenticate();
+        return JWTAuth::getPayload();
+    }
+}
+
+if (! function_exists('getLocker')) {
+    function getLocker()
     {
         JWTAuth::parseToken()->authenticate();
         return JWTAuth::getPayload();

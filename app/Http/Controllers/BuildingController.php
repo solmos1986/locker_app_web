@@ -1,37 +1,57 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Services\UsersService;
+use App\Services\BuildingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class UsersController extends Controller
+class BuildingController extends Controller
 {
-    protected UsersService $usersService;
-    public function __construct(UsersService $usersService)
+    protected BuildingService $buildingService;
+    public function __construct(BuildingService $buildingService)
     {
-        $this->usersService = $usersService;
+        $this->buildingService = $buildingService;
     }
     /**
      * Display a listing of the resource.
      */
-    public function dataTable(Request $request)
+    public function dashBoardBuilding(Request $request)
     {
-        Log::info("UsersController dataTable " . jsonLog($request->all()));
+        Log::info("BuildingController dashBoard " . jsonLog($request->all()));
         try {
-            $pageSize  = is_null($request->pageSize) ? 100 : $request->pageSize;
-            $active    = is_null($request->active) ? "id" : $request->active;
-            $direction = is_null($request->direction) ? "ASC" : $request->direction;
-            $pageIndex = is_null($request->pageIndex) ? 0 : $request->pageIndex;
-            $search    = is_null($request->search) ? '' : $request->search;
-            $movements = $this->usersService->dataTable($request->locker_id, $pageSize, $pageIndex, $active, $direction, $search);
+            $building = $this->buildingService->listBuild();
             return response()->json([
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
                     'message' => 'Get Movement',
                 ],
-                'data' => $movements,
+                'data' => $building,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+    public function dashBoardLocker(Request $request)
+    {
+        Log::info("BuildingController dashBoard " . jsonLog($request->all()));
+        try {
+            $building = $this->buildingService->bluildingStatus($request->building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $building,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
@@ -49,45 +69,26 @@ class UsersController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function requeriment(Request $request)
+    public function create()
     {
-        Log::info("UsersController requeriment " . jsonLog($request->all()));
-        try {
-            $requeriment = $this->usersService->requeriment();
-            return response()->json([
-                'meta' => [
-                    'code'    => 200,
-                    'status'  => 'success',
-                    'message' => 'Get requeriment',
-                ],
-                'data' => $requeriment,
-            ]);
-        } catch (\Throwable $th) {
-            Log::error($th);
-            return response()->json([
-                'meta' => [
-                    'code'    => 500,
-                    'status'  => 'error',
-                    'message' => 'An error has occurred!',
-                ],
-                'data' => null,
-            ]);
-        }
+        //
     }
 
-/**
- * Store a newly created resource in storage.
- */
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        Log::info("UsersController store " . jsonLog($request->all()));
+        Log::info("BuildingController store " . jsonLog($request->all()));
         try {
-            $store = $this->usersService->storeUser(
+            $store = $this->buildingService->store(
+                $request->building_id,
+                $request->company_id,
                 $request->name,
-                $request->email,
-                $request->celular,
-                $request->password,
-                $request->roles,
+                $request->code,
+                $request->address,
+                $request->manager,
+                $request->phone,
             );
             return response()->json([
                 'meta' => [
@@ -110,30 +111,30 @@ class UsersController extends Controller
         }
     }
 
-/**
- * Display the specified resource.
- */
+    /**
+     * Display the specified resource.
+     */
     public function show(string $id)
     {
-
+        //
     }
 
-/**
- * Show the form for editing the specified resource.
- */
-    public function edit(string $id)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request, string $id)
     {
-        Log::info("UsersController edit " . jsonLog($id));
+        Log::info("BuildingController edit " . jsonLog($request->all()));
         try {
-            $user = $this->usersService->editUser($id);
 
+            $building = $this->buildingService->edit($id);
             return response()->json([
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
-                    'message' => 'Usuario obtendido correctamente',
+                    'message' => 'Obtenido correctamente',
                 ],
-                'data' => $user,
+                'data' => $building,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
@@ -148,29 +149,29 @@ class UsersController extends Controller
         }
     }
 
-/**
- * Update the specified resource in storage.
- */
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, string $id)
     {
-        Log::info("UsersController update " . jsonLog($request->all()));
+        Log::info("BuildingController store " . jsonLog($request->all()));
         try {
-            $update = $this->usersService->updateUser(
-                $request->id,
+            $store = $this->buildingService->update(
+                $request->building_id,
+                $request->company_id,
                 $request->name,
-                $request->email,
-                $request->celular,
-                $request->password,
-                $request->roles,
+                $request->code,
+                $request->address,
+                $request->manager,
+                $request->phone,
             );
-
             return response()->json([
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
                     'message' => 'Modificado correctamente',
                 ],
-                'data' => $update,
+                'data' => $store,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
@@ -185,22 +186,22 @@ class UsersController extends Controller
         }
     }
 
-/**
- * Remove the specified resource from storage.
- */
-    public function destroy(string $id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Request $request, string $id)
     {
-        Log::info("UsersController destroy " . jsonLog($id));
+        Log::info("BuildingController destroy " . jsonLog($request->all()));
         try {
-            $delete = $this->usersService->deleteUser($id);
 
+            $building = $this->buildingService->delete($id);
             return response()->json([
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
                     'message' => 'Eliminado correctamente',
                 ],
-                'data' => $delete,
+                'data' => $building,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
