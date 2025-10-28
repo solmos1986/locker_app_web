@@ -164,7 +164,8 @@ class MovementService
                     'Content-Type' => 'application/json',
                     'Accept'       => '*/*',
                 ],
-                'body'    => json_encode($data),
+                //'body'    => json_encode($data),
+                'verify' => false,
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
