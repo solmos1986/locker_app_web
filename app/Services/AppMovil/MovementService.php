@@ -73,6 +73,8 @@ class MovementService
         Log::info("MovementService storeMovement set data  " . jsonLog($data));
         Log::info("MovementService storeMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
         $client = new \GuzzleHttp\Client();
+
+        $this->sendNotificationWhatsapp($code);
         /*  try {
             $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
                 'headers' => [
@@ -144,6 +146,29 @@ class MovementService
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService updateMovement error al notificar al servidor");
+        }
+    }
+
+    function sendNotificationWhatsapp($code)
+    {
+        Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
+        try {
+            $data = [];
+
+            $client   = new \GuzzleHttp\Client();
+            $response = $client->post("https://smart-lock.aplus-security.com" . "/movement/" . $code, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json',
+                ],
+                'body'    => json_encode($data),
+            ]);
+            Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
+
+        } catch (\Throwable $th) {
+            Log::error($th);
+            Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
         }
     }
 }
