@@ -155,17 +155,20 @@ class MovementService
         try {
             $data = [];
 
-            $client   = new \GuzzleHttp\Client();
-            $response = $client->get("https://smart-lock.aplus-security.com/movement/" . $code, [
+            $client = new \GuzzleHttp\Client();
+
+            Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
+            $response = $client->get("https://smart-lock.aplus-security.com/movement/$code", [
                 'headers' => [
                     //'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
-                    'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'Accept'       => '*/*',
                 ],
                 'body'    => json_encode($data),
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
-
+            $body = $response->getBody();
+            Log::info("MovementService sendNotificationWhatsapp " . jsonLog($body->getContents()));
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
