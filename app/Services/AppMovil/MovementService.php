@@ -158,7 +158,7 @@ class MovementService
             $client = new \GuzzleHttp\Client();
 
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
-            $response = $client->get("https://smart-lock.aplus-security.com/movement/$code", [
+            $response = $client->request("GET","https://smart-lock.aplus-security.com/movement/$code", [
                 'headers' => [
                     //'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type' => 'application/json',
