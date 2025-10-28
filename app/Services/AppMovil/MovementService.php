@@ -156,9 +156,9 @@ class MovementService
             $data = [];
 
             $client   = new \GuzzleHttp\Client();
-            $response = $client->post("https://smart-lock.aplus-security.com" . "/movement/" . $code, [
+            $response = $client->get("https://smart-lock.aplus-security.com/movement/" . $code, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
+                    //'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type'  => 'application/json',
                     'Accept'        => 'application/json',
                 ],
