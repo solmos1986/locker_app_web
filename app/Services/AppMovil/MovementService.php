@@ -143,24 +143,28 @@ class MovementService
     {
         Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
 
-        $response = Http::withHeaders([
+        /* $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-            'Accept'       => '*/*',
+            
         ])->get("https://smart-lock.aplus-security.com/movement/$code", [
             'name' => 'morpheus',
             'job'  => 'leader',
-        ]);
+        ]); */
         //return $response;
 
-        /* try {
+        try {
             $client = new \GuzzleHttp\Client();
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
             $response = $client->request("GET", "https://smart-lock.aplus-security.com/movement/$code", [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    
+                     'Accept'       => '*/*',
                 ],
                 'verify'  => false,
+                'timeout' => 60,
+                'curl'    => [
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                ],
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
@@ -168,7 +172,7 @@ class MovementService
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
-        } */
+        }
     }
 
     function sendNotificationHolding(
