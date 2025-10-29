@@ -70,14 +70,14 @@ class MovementService
             ->where('movement.movement_id', $movement_id)
             ->first();
 
-        $this->sendNotificationHolding(
+        /* $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
             $verificate_movement->code,
             $verificate_movement->id_ref,
             $movement_id
-        );
+        ); */
         $this->sendNotificationWhatsapp($code);
 
     }
