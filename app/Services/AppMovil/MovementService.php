@@ -3,7 +3,6 @@ namespace App\Services\AppMovil;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class MovementService
@@ -145,7 +144,7 @@ class MovementService
 
         /* $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-            
+
         ])->get("https://smart-lock.aplus-security.com/movement/$code", [
             'name' => 'morpheus',
             'job'  => 'leader',
@@ -153,12 +152,14 @@ class MovementService
         //return $response;
 
         try {
-            $client = new \GuzzleHttp\Client();
+            $client = new \GuzzleHttp\Client([
+                'verify' => false,
+            ]);
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
             $response = $client->request("GET", "https://smart-lock.aplus-security.com/movement/$code", [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                     'Accept'       => '*/*',
+                    'Accept'       => '*/*',
                 ],
                 'verify'  => false,
                 'timeout' => 60,
