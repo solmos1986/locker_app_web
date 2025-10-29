@@ -75,7 +75,7 @@ class MovementService
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
             $verificate_movement->code,
-            $verificate_movement->codigoSizeDoor,
+            $verificate_movement->id_ref,
             $movement_id
         );
         $this->sendNotificationWhatsapp($code);
@@ -132,7 +132,7 @@ class MovementService
                 $verificate_movement->nameDepartament,
                 $verificate_movement->door_id,
                 $verificate_movement->code,
-                $verificate_movement->codigoSizeDoor,
+                $verificate_movement->id_ref,
                 $movement_id
             );
         }
@@ -196,7 +196,7 @@ class MovementService
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
+                    'Accept'        => '*/*',
                 ],
                 'body'    => json_encode($data),
             ]);
@@ -250,7 +250,7 @@ class MovementService
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
+                    'Accept'        => '*/*',
                 ],
                 'body'    => json_encode($data),
             ]);
