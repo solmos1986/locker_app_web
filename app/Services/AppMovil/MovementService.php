@@ -78,6 +78,8 @@ class MovementService
             $verificate_movement->id_ref,
             $movement_id
         ); */
+
+        var_dump(openssl_get_cert_locations());
         $this->sendNotificationWhatsapp($code);
 
     }
