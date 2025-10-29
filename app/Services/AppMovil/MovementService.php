@@ -62,12 +62,12 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
-            ->where('id_ref', $id_ref)
-            ->where('department_id', $department_id)
-            ->where('code', $code)
-            ->where('door_id', $door_id)
-            ->where('building_id', getLocker()->get('building_id'))
-            ->where('movement_id', $movement_id)
+            ->where('movement.id_ref', $id_ref)
+            ->where('movement.department_id', $department_id)
+            ->where('movement.code', $code)
+            ->where('movement.door_id', $door_id)
+            ->where('movement.building_id', getLocker()->get('building_id'))
+            ->where('movement.movement_id', $movement_id)
             ->first();
 
         $this->sendNotificationHolding(
@@ -110,11 +110,11 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
-            ->where('id_ref', $id_ref)
-            ->where('department_id', $department_id)
-            ->where('code', $code)
-            ->where('door_id', $door_id)
-            ->where('building_id', getLocker()->get('building_id'))
+            ->where('movement.id_ref', $id_ref)
+            ->where('movement.department_id', $department_id)
+            ->where('movement.code', $code)
+            ->where('movement.door_id', $door_id)
+            ->where('movement.building_id', getLocker()->get('building_id'))
             ->first();
 
         if ($verificate_movement) {
