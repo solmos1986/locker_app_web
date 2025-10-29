@@ -154,6 +154,9 @@ class MovementService
         try {
             $client = new \GuzzleHttp\Client([
                 'verify' => false,
+                'curl'   => [
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2, // Or other appropriate version
+                ],
             ]);
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
             $response = $client->request("GET", "https://smart-lock.aplus-security.com/movement/$code", [
