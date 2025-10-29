@@ -79,7 +79,7 @@ class MovementService
             $movement_id
         ); */
 
-        //var_dump(openssl_get_cert_locations());
+        var_dump(openssl_get_cert_locations());
         $this->sendNotificationWhatsapp($code);
 
     }
