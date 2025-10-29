@@ -149,7 +149,7 @@ class MovementService
                     'Content-Type' => 'application/json',
                     'Accept'       => '*/*',
                 ],
-                'verify'  => true,
+                'verify'  => false,
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
