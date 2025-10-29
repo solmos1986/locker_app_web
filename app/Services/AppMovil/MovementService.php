@@ -159,7 +159,9 @@ class MovementService
                 ],
             ]);
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
-            $response = $client->request("GET", "https://smart-lock.aplus-security.com/movement/$code", [
+            $url= "https://smart-lock.aplus-security.com/movement/$code";
+
+            $response = $client->request("GET", "https://test-api.boliviasoft.com/movement/$code", [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept'       => '*/*',
