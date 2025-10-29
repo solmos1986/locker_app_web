@@ -92,7 +92,7 @@ class MovementController extends Controller
         Log::info("MovementService received " . jsonLog($request->movement_id));
 
         try {
-            $this->movementService->updateMovement($request->movement_id);
+            $this->movementService->updateMovement($request->department_id, $request->door_id, $request->code, $request->id_ref);
             return response()->json([
                 'meta' => [
                     'code'    => 200,

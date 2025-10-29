@@ -22,7 +22,7 @@ Route::middleware('auth:locker')->group(function () {
     Route::get('/get-token', [DatabaseController::class, 'getToken']);
     Route::get('/database', [DatabaseController::class, 'dataBase']);
     Route::post('/movement/pending', [MovementController::class, 'pending']);
-    Route::put('/movement/received', [MovementController::class, 'received']);
+    Route::post('/movement/received', [MovementController::class, 'received']);
 });
 
 Route::post('/create-token', [DatabaseController::class, 'createToken']);

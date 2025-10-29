@@ -4,7 +4,6 @@ namespace App\Services\AppMovil;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class MovementService
 {
@@ -39,7 +38,6 @@ class MovementService
         Log::info("MovementService storeMovement " . jsonLog([$department_id, $door_id, $code, $id_ref]));
         Log::info("MovementService storeMovement getLocker " . jsonLog(getLocker()));
 
-        $id          = Str::uuid();
         $movement_id = DB::table('movement')->insertGetId([
             "department_id"    => $department_id,
             "door_id"          => $door_id,
@@ -49,103 +47,94 @@ class MovementService
             "type_movement_id" => 1,
         ]);
 
-        $movement = DB::table('movement')
+        $verificate_movement = DB::table('movement')
+            ->select(
+                'movement.id_ref',
+                'movement.department_id',
+                'movement.type_movement_id',
+                'movement.door_id',
+                'movement.code',
+                'movement.building_id',
+                'department.name as nameDepartament',
+                'door.name as numberDoor',
+                'door_size.codigo as codigoSizeDoor'
+            )
             ->join('department', 'department.department_id', 'movement.department_id')
-            ->where('movement.movement_id', $movement_id)
+            ->join('door', 'door.door_id', 'movement.door_id')
+            ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
+            ->where('id_ref', $id_ref)
+            ->where('department_id', $department_id)
+            ->where('code', $code)
+            ->where('door_id', $door_id)
+            ->where('building_id', getLocker()->get('building_id'))
+            ->where('movement_id', $movement_id)
             ->first();
 
-        $data = [
-            "id"              => $id,
-            "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
-            "size"            => "medium",
-            "deliveryToken"   => $code,
-            "externalOrderId" => "delivery",
-            "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
-            "collectToken"    => $code,
-            "status"          => "allocated",
-            "senderId"        => "delivery",
-            "receiverId"      => $movement->name,
-            "activate"        => true,
-            "collected"       => false,
-            "delivered"       => true,
-        ];
-        Log::info("MovementService storeMovement set enviar server  " . jsonLog(env("URL_APP_EXPERIENCE") . "/api/lockers-v1"));
-        Log::info("MovementService storeMovement set data  " . jsonLog($data));
-        Log::info("MovementService storeMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
-        $client = new \GuzzleHttp\Client();
-
+        $this->sendNotificationHolding(
+            $verificate_movement->codigoSizeDoor,
+            $verificate_movement->nameDepartament,
+            $verificate_movement->door_id,
+            $verificate_movement->code,
+            $verificate_movement->codigoSizeDoor,
+            $movement_id
+        );
         $this->sendNotificationWhatsapp($code);
-        /*  try {
-            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
-                    'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
-                ],
-                'body'    => json_encode($data),
-            ]);
-            Log::info("MovementService storeMovement status " . jsonLog($response->getStatusCode()));
-            Log::info("MovementService storeMovement response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
-            $update = DB::table('movement')
-                ->where('movement_id', $movement_id)->update([
-                "send_delivery" => 1,
-            ]);
-            Log::info("MovementService movimiento modificado " . jsonLog($update));
-        } catch (\Throwable $th) {
-            Log::error($th);
-            Log::info("MovementService storeMovement error al notificar al servidor");
-        } */
 
     }
 
-    public function updateMovement($movement_id)
-    {
-        Log::info("MovementService updateMovement($movement_id)");
-        $update = DB::table('movement')
-            ->where('movement_id', $movement_id)
-            ->update([
-                "delivered" => 1,
-            ]);
-        $movement = DB::table('movement')->join('user', 'movement.user_id', 'user.user_id')->where('movement.movement_id', $movement_id)
+    public function updateMovement(
+        $department_id,
+        $door_id,
+        $code,
+        $id_ref
+    ) {
+        Log::info("MovementService updateMovement" . jsonLog([
+            $department_id,
+            $door_id,
+            $code,
+            $id_ref,
+        ]));
+
+        $verificate_movement = DB::table('movement')
+            ->select(
+                'movement.id_ref',
+                'movement.department_id',
+                'movement.type_movement_id',
+                'movement.door_id',
+                'movement.code',
+                'movement.building_id',
+                'department.name as nameDepartament',
+                'door.name as numberDoor',
+                'door_size.codigo as codigoSizeDoor'
+            )
+            ->join('department', 'department.department_id', 'movement.department_id')
+            ->join('door', 'door.door_id', 'movement.door_id')
+            ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
+            ->where('id_ref', $id_ref)
+            ->where('department_id', $department_id)
+            ->where('code', $code)
+            ->where('door_id', $door_id)
+            ->where('building_id', getLocker()->get('building_id'))
             ->first();
-        $data = [
-            "id"              => $movement->id_ref,
-            "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
-            "size"            => "medium",
-            "deliveryToken"   => $movement->code,
-            "externalOrderId" => "delivery",
-            "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
-            "collectToken"    => $movement->code,
-            "status"          => "collected",
-            "senderId"        => "delivery",
-            "receiverId"      => $movement->name,
-            "activate"        => true,
-            "collected"       => true,
-            "delivered"       => true,
-        ];
-        Log::info("MovementService updateMovement set enviar server  " . jsonLog(env("URL_APP_EXPERIENCE") . "/api/lockers-v1"));
-        Log::info("MovementService updateMovement set data  " . jsonLog($data));
-        Log::info("MovementService updateMovement set token  " . jsonLog(env("TOKEN_EXPERIENCE")));
-        $client = new \GuzzleHttp\Client();
-        try {
-            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
-                    'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
-                ],
-                'body'    => json_encode($data),
+
+        if ($verificate_movement) {
+            $movement_id = DB::table('movement')->insertGetId([
+                "department_id"    => $department_id,
+                "door_id"          => $door_id,
+                "id_ref"           => $id_ref,
+                "building_id"      => getLocker()->get('building_id'),
+                "code"             => $code,
+                "type_movement_id" => 2,
             ]);
-            Log::info("MovementService updateMovement status " . jsonLog($response->getStatusCode()));
-            Log::info("MovementService updateMovement response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
-            $update = DB::table('movement')
-                ->where('movement_id', $movement_id)->update([
-                "send_completed" => 1,
-            ]);
-            Log::info("MovementService movimiento modificado " . jsonLog($update));
-        } catch (\Throwable $th) {
-            Log::error($th);
-            Log::info("MovementService updateMovement error al notificar al servidor");
+
+            $this->modificateNotificationHolding(
+                $verificate_movement->codigoSizeDoor,
+                $verificate_movement->nameDepartament,
+                $verificate_movement->door_id,
+                $verificate_movement->code,
+                $verificate_movement->codigoSizeDoor,
+                $movement_id
+            );
         }
     }
 
@@ -153,19 +142,14 @@ class MovementService
     {
         Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
         try {
-            $data = [];
-
             $client = new \GuzzleHttp\Client();
-
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
-            $response = $client->request("GET","https://smart-lock.aplus-security.com/movement/$code", [
+            $response = $client->request("GET", "https://smart-lock.aplus-security.com/movement/$code", [
                 'headers' => [
-                    //'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type' => 'application/json',
                     'Accept'       => '*/*',
                 ],
-                //'body'    => json_encode($data),
-                'verify' => true,
+                'verify'  => true,
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
@@ -173,6 +157,114 @@ class MovementService
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
+        }
+    }
+
+    function sendNotificationHolding(
+        $codigoSizeDoor,
+        $nameDepartament,
+        $door_id,
+        $code,
+        $id_ref,
+        $movement_id
+    ) {
+        Log::info("MovementService sendNotificationHolding " . jsonLog([
+            $codigoSizeDoor,
+            $nameDepartament,
+            $door_id,
+            $code,
+            $id_ref,
+        ]));
+        try {
+            $client = new \GuzzleHttp\Client();
+            $data   = [
+                "id"              => $id_ref,
+                "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
+                "size"            => $codigoSizeDoor,
+                "deliveryToken"   => $code,
+                "externalOrderId" => "delivery",
+                "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
+                "collectToken"    => $code,
+                "status"          => "allocated",
+                "senderId"        => "delivery",
+                "receiverId"      => $nameDepartament,
+                "activate"        => true,
+                "collected"       => false,
+                "delivered"       => true,
+            ];
+            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json',
+                ],
+                'body'    => json_encode($data),
+            ]);
+            Log::info("MovementService sendNotificationHolding status " . jsonLog($response->getStatusCode()));
+            Log::info("MovementService sendNotificationHolding response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
+            $update = DB::table('movement')
+                ->where('movement_id', $movement_id)
+                ->update([
+                    "status_integrate" => 1,
+                ]);
+            Log::info("MovementService sendNotificationHolding modificado " . jsonLog($update));
+        } catch (\Throwable $th) {
+            Log::error($th);
+            Log::info("MovementService sendNotificationHolding error al notificar al servidor");
+        }
+    }
+
+    function modificateNotificationHolding(
+        $codigoSizeDoor,
+        $nameDepartament,
+        $door_id,
+        $code,
+        $id_ref,
+        $movement_id
+    ) {
+        Log::info("MovementService modificateNotificationHolding " . jsonLog([
+            $codigoSizeDoor,
+            $nameDepartament,
+            $door_id,
+            $code,
+            $id_ref,
+        ]));
+        try {
+            $client = new \GuzzleHttp\Client();
+            $data   = [
+                "id"              => $id_ref,
+                "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
+                "size"            => $codigoSizeDoor,
+                "deliveryToken"   => $code,
+                "externalOrderId" => "delivery",
+                "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
+                "collectToken"    => $code,
+                "status"          => "allocated",
+                "senderId"        => "delivery",
+                "receiverId"      => $nameDepartament,
+                "activate"        => true,
+                "collected"       => true,
+                "delivered"       => true,
+            ];
+            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/json',
+                ],
+                'body'    => json_encode($data),
+            ]);
+            Log::info("MovementService modificateNotificationHolding status " . jsonLog($response->getStatusCode()));
+            Log::info("MovementService modificateNotificationHolding response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
+            $update = DB::table('movement')
+                ->where('movement_id', $movement_id)
+                ->update([
+                    "status_integrate" => 1,
+                ]);
+            Log::info("MovementService modificateNotificationHolding modificado " . jsonLog($update));
+        } catch (\Throwable $th) {
+            Log::error($th);
+            Log::info("MovementService modificateNotificationHolding error al notificar al servidor");
         }
     }
 }
