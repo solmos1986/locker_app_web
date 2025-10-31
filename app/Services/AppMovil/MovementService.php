@@ -79,7 +79,7 @@ class MovementService
             $movement_id
         ); */
 
-        var_dump(openssl_get_cert_locations());
+        //var_dump(openssl_get_cert_locations());
         $this->sendNotificationWhatsapp($code);
 
     }
@@ -161,27 +161,22 @@ class MovementService
                 ],
             ]);
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
-            $url = "https://smart-lock.aplus-security.com/movement/$code";
+            $url= "https://smart-lock.aplus-security.com/movement/$code";
 
-            $response = \Httpful\Request::get($url)
-                ->expectsJson()
-                ->contentType('application/json')
-                ->send();
-
-            /* $response = $client->request("GET", "https://test-api.boliviasoft.com/movement/$code", [
+            $response = $client->request("GET", "https://test-api.boliviasoft.com/movement/$code", [
                 'headers' => [
                     'Content-Type' => 'application/json',
+                    'Accept'       => '*/*',
                 ],
                 'verify'  => false,
                 'timeout' => 60,
                 'curl'    => [
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
                 ],
-            ]); */
-            
-            Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->body->name));
-            //$body = $response->getBody();
-            //Log::info("MovementService sendNotificationWhatsapp " . jsonLog($body->getContents()));
+            ]);
+            Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
+            $body = $response->getBody();
+            Log::info("MovementService sendNotificationWhatsapp " . jsonLog($body->getContents()));
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
