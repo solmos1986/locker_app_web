@@ -34,7 +34,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
                             </h1>
                         </div>
                         <div>
-                            <form method="POST" action="{{ route('login.verificate') }}">
+                            <form method="POST" action="#">
                                 {!! csrf_field() !!}
                                 <div class="space-y-5">
                                     <!-- Email -->

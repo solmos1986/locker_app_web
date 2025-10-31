@@ -9,8 +9,8 @@ use App\Http\Controllers\MovementController;
 use App\Http\Controllers\ResidentController;
 use Illuminate\Support\Facades\Route;
 
-/* Route::get('/', [LoginController::class, 'index'])->name('login');
-Route::post('/login', [LoginController::class, 'verificate'])->name('login.verificate');
+Route::get('/', [LoginController::class, 'index'])->name('login');
+/* Route::post('/login', [LoginController::class, 'verificate'])->name('login.verificate');
 
 Route::middleware(['auth'])->group(function () {
 
