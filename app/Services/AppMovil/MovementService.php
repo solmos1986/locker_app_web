@@ -70,17 +70,16 @@ class MovementService
             ->where('movement.movement_id', $movement_id)
             ->first();
 
-        /* $this->sendNotificationHolding(
+        $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
             $verificate_movement->code,
             $verificate_movement->id_ref,
             $movement_id
-        ); */
+        );
 
-        //var_dump(openssl_get_cert_locations());
-        $this->sendNotificationWhatsapp($code);
+        //$this->sendNotificationWhatsapp($code);
 
     }
 
@@ -143,16 +142,6 @@ class MovementService
     function sendNotificationWhatsapp($code)
     {
         Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
-
-        /* $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-
-        ])->get("https://smart-lock.aplus-security.com/movement/$code", [
-            'name' => 'morpheus',
-            'job'  => 'leader',
-        ]); */
-        //return $response;
-
         try {
             $client = new \GuzzleHttp\Client([
                 'verify' => false,
@@ -160,19 +149,16 @@ class MovementService
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2, // Or other appropriate version
                 ],
             ]);
-            Log::info("MovementService sendNotificationWhatsapp url " . jsonLog("https://smart-lock.aplus-security.com/movement/$code"));
-            $url= "https://smart-lock.aplus-security.com/movement/$code";
 
-            $response = $client->request("GET", "https://test-api.boliviasoft.com/movement/$code", [
+            $url = "https://smart-lock.aplus-security.com/movement/$code";
+            Log::info("MovementService sendNotificationWhatsapp url " . jsonLog($url));
+            $response = $client->request("GET", $url, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Accept'       => '*/*',
                 ],
                 'verify'  => false,
                 'timeout' => 60,
-                'curl'    => [
-                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
-                ],
             ]);
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
@@ -203,7 +189,7 @@ class MovementService
             $data   = [
                 "id"              => $id_ref,
                 "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
-                "size"            => $codigoSizeDoor,
+                "size"            => strtolower($codigoSizeDoor),
                 "deliveryToken"   => $code,
                 "externalOrderId" => "delivery",
                 "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
@@ -215,7 +201,10 @@ class MovementService
                 "collected"       => false,
                 "delivered"       => true,
             ];
-            $response = $client->post(env("URL_APP_EXPERIENCE") . "/api/lockers-v1", [
+            $url = env("URL_APP_EXPERIENCE") . "/api/lockers-v1";
+            Log::info("MovementService sendNotificationHolding url " . jsonLog($url));
+            Log::info("MovementService sendNotificationHolding status " . jsonLog($data));
+            $response = $client->post($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
                     'Content-Type'  => 'application/json',
@@ -257,7 +246,7 @@ class MovementService
             $data   = [
                 "id"              => $id_ref,
                 "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
-                "size"            => $codigoSizeDoor,
+                "size"            => strtolower($codigoSizeDoor),
                 "deliveryToken"   => $code,
                 "externalOrderId" => "delivery",
                 "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),

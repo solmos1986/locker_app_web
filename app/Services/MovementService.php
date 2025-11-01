@@ -33,9 +33,9 @@ class MovementService
             ->orderBy($active, $direction)
             ->paginate($pageSize);
 
-        Log::info("MovementService dataTable movements " . jsonLog($movements->items()));
+        Log::info("MovementService dataTable movements " . jsonLog($movements));
         $dataTable->paginate = [
-            'length'    => $movements->count(),
+            'length'    => $movements->total(),
             'pageIndex' => $pageIndex,
             'pageSize'  => $pageSize,
         ];
