@@ -87,7 +87,7 @@ class MovementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function received(string $id, Request $request)
+    public function received(Request $request)
     {
         Log::info("MovementService received " . jsonLog($request->movement_id));
 
