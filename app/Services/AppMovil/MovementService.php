@@ -253,7 +253,7 @@ class MovementService
                 "externalOrderId" => "delivery",
                 "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
                 "collectToken"    => $code,
-                "status"          => "allocated",
+                "status"          => "collected",
                 "senderId"        => "delivery",
                 "receiverId"      => $nameDepartament,
                 "activate"        => true,
