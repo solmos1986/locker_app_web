@@ -4,6 +4,7 @@ namespace App\Services\AppMovil;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MovementService
 {
@@ -35,6 +36,7 @@ class MovementService
 
     public function storeMovement($department_id, $door_id, $code, $id_ref)
     {
+        $id_ref = Str::uuid()->toString();
         Log::info("MovementService storeMovement " . jsonLog([$department_id, $door_id, $code, $id_ref]));
         Log::info("MovementService storeMovement getLocker " . jsonLog(getLocker()));
 
