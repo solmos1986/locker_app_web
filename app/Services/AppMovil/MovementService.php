@@ -79,7 +79,7 @@ class MovementService
             $movement_id
         );
 
-        //$this->sendNotificationWhatsapp($code);
+        $this->sendNotificationWhatsapp($code);
 
     }
 
