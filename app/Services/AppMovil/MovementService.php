@@ -113,7 +113,7 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
-            ->where('movement.id_ref', $id_ref)
+            //->where('movement.id_ref', $id_ref)
             ->where('movement.department_id', $department_id)
             ->where('movement.code', $code)
             ->where('movement.door_id', $door_id)
@@ -124,7 +124,7 @@ class MovementService
             $movement_id = DB::table('movement')->insertGetId([
                 "department_id"    => $department_id,
                 "door_id"          => $door_id,
-                "id_ref"           => $id_ref,
+                "id_ref"           => $verificate_movement->id_ref,
                 "building_id"      => getLocker()->get('building_id'),
                 "code"             => $code,
                 "type_movement_id" => 2,
