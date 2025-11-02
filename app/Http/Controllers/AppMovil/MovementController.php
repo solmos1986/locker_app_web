@@ -89,7 +89,7 @@ class MovementController extends Controller
      */
     public function received(Request $request)
     {
-        Log::info("MovementService received " . jsonLog($request->movement_id));
+        Log::info("MovementController received " . jsonLog($request->all()));
 
         try {
             $this->movementService->updateMovement($request->department_id, $request->door_id, $request->code, $request->id_ref);
