@@ -31,7 +31,7 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->where('movement.building_id', 1) //getUser()->get('client_id')
             ->orderBy($active, $direction)
-            ->skip($pageSize * $pageIndex)
+            ->skip($pageSize * ($pageIndex === 0 ? 1 : $pageIndex))
             ->paginate($pageSize);
 
         Log::info("MovementService dataTable movements " . jsonLog($movements));
