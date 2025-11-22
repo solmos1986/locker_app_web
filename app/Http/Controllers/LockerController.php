@@ -94,6 +94,33 @@ class LockerController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    public function detailed_movement(Request $request)
+    {
+        Log::info("LockerController detailed_movement " . jsonLog($request));
+        try {
+            $detailed_activity = $this->lockerService->detailed_movement($request->id_ref);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get detailed movement',
+                ],
+                'data' => $detailed_activity,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
     public function index()
     {
         Log::info("LockerController index ");

@@ -1,14 +1,19 @@
 <?php
 namespace App\Services;
 
+use App\RabbitMQ;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class DoorService
 {
-    public function __construct()
-    {}
+    protected RabbitMQ $rabbitMQ;
+    public function __construct(
+        RabbitMQ $rabbitMQ
+    ) {
+        $this->rabbitMQ = $rabbitMQ;
+    }
 
     public function dataTable($locker_id, $pageSize, $pageIndex, $active, $direction, $search)
     {
@@ -128,5 +133,20 @@ class DoorService
             ->where('door.door_id', $locker_id)
             ->delete();
         return;
+    }
+
+    public function openDoor($door_id)
+    {
+        Log::info("DoorService openDoor " . jsonLog([$door_id]));
+        $door = DB::table('door')
+            ->where('door_id', $door_id)
+            ->first();
+        $message = [
+            "door_id"      => $door->door_id,
+            "name"         => $door->name,
+            "door_size_id" => $door->door_size_id,
+        ];
+        $message = json_encode($message);
+        $this->rabbitMQ->publish($message);
     }
 }

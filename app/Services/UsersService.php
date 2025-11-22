@@ -55,6 +55,7 @@ class UsersService
                 'rol_id',
                 'name'
             )
+            ->orderBy('name','ASC')
             ->get();
         $buildings = DB::table('building')
             ->select(

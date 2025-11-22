@@ -131,6 +131,37 @@ class DoorController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function open(string $id)
+    {
+        Log::info("ControllerController open " . jsonLog($id));
+        try {
+            $door = $this->doorService->openDoor(
+                $id,
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Solicitud de apertura enviada',
+                ],
+                'data' => $door,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Request $request, string $id)

@@ -10,9 +10,9 @@ class MovementService
     public function __construct()
     {}
 
-    public function dataTable($pageSize, $pageIndex, $active, $direction, $search)
+    public function dataTable($locker_id, $pageSize, $pageIndex, $active, $direction, $search)
     {
-        Log::info("MovementService dataTable " . jsonLog([$pageSize, $pageIndex, $active, $direction, $search]));
+        Log::info("MovementService dataTable " . jsonLog([$locker_id, $pageSize, $pageIndex, $active, $direction, $search]));
         $dataTable = new stdClass();
         $movements = DB::table('movement')
             ->select(
@@ -21,20 +21,25 @@ class MovementService
                 'door.name as casillero',
                 'movement.code',
                 'movement.id_ref',
-                'movement.status_integrate',
                 'movement.status_notificate',
-                'type_movement.name as state',
-                'movement.create_at'
+                'movement.create_at',
+                DB::raw("GROUP_CONCAT( type_movement.name SEPARATOR ' / ') as state"),
+                DB::raw("GROUP_CONCAT( IF(movement.status_integrate=1, 'si', 'no') SEPARATOR ' / ') as status_integrate"),
             )
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
             ->join('department', 'department.department_id', 'movement.department_id')
-            ->where('movement.building_id', 1) //getUser()->get('client_id')
+            ->where('movement.building_id', $locker_id) //getUser()->get('client_id')
+            ->groupBy(
+                'movement.id_ref',
+            )
             ->orderBy($active, $direction)
             ->skip($pageSize * ($pageIndex === 0 ? 1 : $pageIndex))
-            ->paginate($pageSize);
+            ->paginate($pageSize, ['*'], null, ($pageIndex + 1));
 
-        Log::info("MovementService dataTable movements " . jsonLog($movements));
+        $locker = DB::table('locker')
+            ->where('locker.locker_id', $locker_id)
+            ->first();
         $dataTable->paginate = [
             'length'    => $movements->total(),
             'pageIndex' => $pageIndex,
@@ -45,6 +50,7 @@ class MovementService
             'direction' => $direction,
         ];
         $dataTable->movements = $movements->items();
+        $dataTable->locker    = $locker;
         return $dataTable;
     }
 

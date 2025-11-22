@@ -22,8 +22,9 @@ class MovementController extends Controller
             $active    = is_null($request->active) ? "id_empresa" : $request->active;
             $direction = is_null($request->direction) ? "ASC" : $request->direction;
             $pageIndex = is_null($request->pageIndex) ? 0 : $request->pageIndex;
+            $locker_id = is_null($request->locker_id) ? '' : $request->locker_id;
             $search    = is_null($request->search) ? '' : $request->search;
-            $movements = $this->movementService->dataTable($pageSize, $pageIndex, $active, $direction, $search);
+            $movements = $this->movementService->dataTable($locker_id, $pageSize, $pageIndex, $active, $direction, $search);
             return response()->json([
                 'meta' => [
                     'code'    => 200,
