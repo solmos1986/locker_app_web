@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/info', [DashboardController::class, 'info'])->name('configurations.dashboard.info');
     });
+
     Route::prefix('locker')->group(function () {
         Route::get('/requirement', [LockerController::class, 'requirement'])->name('configurations.locker.requirement');
         Route::post('/data-table', [LockerController::class, 'dataTable'])->name('configurations.locker.data-table');
@@ -101,4 +102,5 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('user-deparment')->group(function () {
         Route::post('/data-table', [UserController::class, 'dataTable'])->name('configurations.user.data-table');
     });
+    
 });

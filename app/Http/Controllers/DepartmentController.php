@@ -12,9 +12,7 @@ class DepartmentController extends Controller
     {
         $this->departamentService = $departamentService;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function dataTable(Request $request)
     {
         Log::info("DepartmentController dataTable " . jsonLog($request->all()));

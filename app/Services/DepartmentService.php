@@ -21,6 +21,7 @@ class DepartmentService
         $dataTable   = new stdClass();
         $departments = DB::table('department')
             ->select(
+                'building.name as name_builder',
                 'department.department_id',
                 'department.building_id',
                 'department.name',

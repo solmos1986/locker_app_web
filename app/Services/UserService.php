@@ -26,8 +26,12 @@ class UserService
                 'user.name',
                 'user.celular',
                 'user.state',
+                'department.name as name_department',
+                'building.name as name_building'
             )
             ->where('user.department_id', $department_id)
+            ->join('department', 'department.department_id', 'user.department_id')
+            ->join('building', 'building.building_id', 'department.building_id')
             ->orderBy($active, $direction)
             ->paginate($pageSize);
         $locker = DB::table('locker')
