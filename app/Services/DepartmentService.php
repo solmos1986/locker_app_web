@@ -30,7 +30,7 @@ class DepartmentService
             ->join('locker', 'locker.building_id', 'building.building_id')
             ->where('locker.locker_id', $locker_id)
             ->orderBy($active, $direction)
-            ->paginate($pageSize);
+            ->paginate($pageSize, ['*'], null, ($pageIndex + 1));
 
         foreach ($departments->items() as $key => $department) {
             $department->users = DB::table('user')
@@ -50,7 +50,7 @@ class DepartmentService
             ->first();
 
         $dataTable->paginate = [
-            'length'    => $departments->count(),
+            'length'    => $departments->total(),
             'pageIndex' => $pageIndex,
             'pageSize'  => $pageSize,
         ];

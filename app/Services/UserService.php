@@ -31,7 +31,7 @@ class UserService
             ->orderBy($active, $direction)
             ->paginate($pageSize);
         $locker = DB::table('locker')
-            ->where('locker_id', $locker_id)
+            ->where('locker.locker_id', $locker_id)
             ->first();
         $dataTable->paginate = [
             'length'    => $users->count(),

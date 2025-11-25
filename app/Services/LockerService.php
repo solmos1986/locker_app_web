@@ -76,6 +76,9 @@ class LockerService
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
             ->where('controller.locker_id', $locker_id)
         //->where('locker.client_id', Auth::user()->getClient->client_id)
+            //->orderBy(DB::raw("FIELD(door.door_id, 1, 8, 2, 3)"))
+            ->orderByRaw('FIELD(door.door_id, 1,8,2,3,7,10,4,5,6,12,13,14,15,11,9,16)')
+            //->whereIn('door.door_id',[1,8,2,3,7,10,4,5,6,12,13,14,15,11,9,16])
             ->get();
         Log::info("LockerService getDoors => " . jsonLog($doors));
         foreach ($doors as $key => $door) {
