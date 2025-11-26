@@ -88,6 +88,7 @@ class UsersController extends Controller
                 $request->celular,
                 $request->password,
                 $request->roles,
+                $request->buildings,
             );
             return response()->json([
                 'meta' => [
@@ -162,6 +163,7 @@ class UsersController extends Controller
                 $request->celular,
                 $request->password,
                 $request->roles,
+                $request->buildings,
             );
 
             return response()->json([

@@ -55,7 +55,7 @@ class UsersService
                 'rol_id',
                 'name'
             )
-            ->orderBy('name','ASC')
+            ->orderBy('name', 'ASC')
             ->get();
         $buildings = DB::table('building')
             ->select(
@@ -78,33 +78,49 @@ class UsersService
         $email,
         $celular,
         $password,
-        $roles
+        $roles,
+        $buildings
     ) {
         Log::info("UsersService storeUser " . jsonLog([
             $name,
             $email,
             $password,
             $roles,
+            $buildings,
         ]));
         $new_password = Hash::make($password);
-        $users_id     = DB::table('users')
+
+        $user_id = DB::table('users')
             ->insertGetId([
                 'name'     => $name,
                 'email'    => $email,
                 'celular'  => $celular,
                 'password' => $new_password,
             ]);
+        $user_company = DB::table('user_company')
+            ->insertGetId([
+                'users_id'   => $user_id,
+                'company_id' => getUser()->get('company_id'),
+            ]);
         $delete = DB::table('users_rol')
-            ->where('users_id', $users_id)
+            ->where('users_id', $user_id)
             ->delete();
         foreach ($roles as $key => $rol) {
-            $insertRol = DB::table('users_rol')
-                ->insert([
+            $inserUsertRol = DB::table('users_rol')
+                ->insertGetId([
                     'rol_id'   => $rol,
-                    'users_id' => $users_id,
+                    'users_id' => $user_id,
                 ]);
+            foreach ($buildings as $key => $building) {
+                $insertUserRolBuilding = DB::table('users_rol_building')
+                    ->insert([
+                        'users_rol_id' => $inserUsertRol,
+                        'building_id'  => $building,
+                    ]);
+            }
         }
-        return $users_id;
+
+        return $user_id;
     }
     public function editUser($id)
     {
@@ -150,7 +166,8 @@ class UsersService
         $email,
         $celular,
         $password,
-        $roles
+        $roles,
+        $buildings
     ) {
         Log::info("UsersService storeUser " . jsonLog([
             $users_id,
@@ -159,9 +176,12 @@ class UsersService
             $celular,
             $password,
             $roles,
+            $buildings,
         ]));
+
         $new_password = Hash::make($password);
-        $update       = DB::table('users')
+
+        $update = DB::table('users')
             ->where('id', $users_id)
             ->update([
                 'name'     => $name,
@@ -169,15 +189,34 @@ class UsersService
                 'celular'  => $celular,
                 'password' => $new_password,
             ]);
+
+        $users_rol = DB::table('users_rol')
+            ->where('users_id', $users_id)
+            ->get();
+
+        foreach ($users_rol as $key => $user_rol) {
+            $deleteUserRolBuilding = DB::table('users_rol_building')
+                ->where('users_rol_id', $user_rol->users_rol_id)
+                ->delete();
+        }
+
         $delete = DB::table('users_rol')
             ->where('users_id', $users_id)
             ->delete();
+
         foreach ($roles as $key => $rol) {
-            $insertRol = DB::table('users_rol')
-                ->insert([
+            $inserUsertRol = DB::table('users_rol')
+                ->insertGetId([
                     'rol_id'   => $rol,
                     'users_id' => $users_id,
                 ]);
+            foreach ($buildings as $key => $building) {
+                $insertUserRolBuilding = DB::table('users_rol_building')
+                    ->insert([
+                        'users_rol_id' => $inserUsertRol,
+                        'building_id'  => $building,
+                    ]);
+            }
         }
         return $update;
     }
@@ -185,13 +224,29 @@ class UsersService
     public function deleteUser($id)
     {
         Log::info("UsersService delete " . jsonLog([$id]));
-        $delete = DB::table('users_rol')
+
+        $users_rol = DB::table('users_rol')
+            ->where('users_id', $id)
+            ->get();
+
+        foreach ($users_rol as $key => $user_rol) {
+            $deleteUserRolBuilding = DB::table('users_rol_building')
+                ->where('users_rol_id', $user_rol->users_rol_id)
+                ->delete();
+        }
+
+        $users_rol = DB::table('users_rol')
             ->where('users_id', $id)
             ->delete();
-        $delete = DB::table('users')
+
+        $user_company = DB::table('user_company')
+            ->where('users_id', $id)
+            ->delete();
+
+        $user = DB::table('users')
             ->where('id', $id)
             ->delete();
 
-        return $delete;
+        return $user;
     }
 }
