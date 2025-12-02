@@ -21,7 +21,7 @@ class BuildingService
                 'locker.address'
             )
             ->join('controller', 'controller.locker_id', 'locker.locker_id')
-            ->where('locker.building_id', 1)
+            ->where('locker.building_id', $building_id)
             ->groupBy('locker.locker_id', 'locker.address', 'locker.name')
             ->get();
 

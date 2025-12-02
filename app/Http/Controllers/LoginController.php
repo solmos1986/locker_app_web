@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function index()
     {
         $new_password = Hash::make('123456789');
-        Log::info("LoginController verificate " . jsonLog($new_password));
+        //Log::info("LoginController verificate " . jsonLog($new_password));
         return view('pages.auth.login');
     }
 
@@ -29,7 +29,7 @@ class LoginController extends Controller
      */
     public function verificate(Request $request)
     {
-        Log::info("LoginController verificate " . jsonLog($request->all()));
+        //Log::info("LoginController verificate " . jsonLog($request->all()));
 
         //$new_password = Hash::make($request->password);
 
