@@ -76,9 +76,9 @@ class LockerService
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
             ->where('controller.locker_id', $locker_id)
         //->where('locker.client_id', Auth::user()->getClient->client_id)
-            //->orderBy(DB::raw("FIELD(door.door_id, 1, 8, 2, 3)"))
+        //->orderBy(DB::raw("FIELD(door.door_id, 1, 8, 2, 3)"))
             ->orderByRaw('FIELD(door.door_id, 1,8,2,3,7,10,4,5,6,12,13,14,15,11,9,16)')
-            //->whereIn('door.door_id',[1,8,2,3,7,10,4,5,6,12,13,14,15,11,9,16])
+        //->whereIn('door.door_id',[1,8,2,3,7,10,4,5,6,12,13,14,15,11,9,16])
             ->get();
         Log::info("LockerService getDoors => " . jsonLog($doors));
         foreach ($doors as $key => $door) {
@@ -148,7 +148,7 @@ class LockerService
                 'type_movement.name as type_movement',
                 'movement.create_at'
             )
-              ->where('movement.id_ref', $id_ref)
+            ->where('movement.id_ref', $id_ref)
             ->where('movement.type_movement_id', 2)
             ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
             ->join('department', 'department.department_id', 'movement.department_id')
@@ -174,14 +174,16 @@ class LockerService
     }
 
     public function storeLocker(
+        $building_id,
         $locker_id,
         $name,
         $address,
         $type_locker_id
     ) {
-        Log::info("LockerService storeLocker " . jsonLog([$name, $address, $type_locker_id]));
+        Log::info("LockerService storeLocker " . jsonLog([$building_id, $locker_id, $name, $address, $type_locker_id]));
+
         $insert = DB::table('locker')->insertGetId([
-            'client_id'      => getUser()->get('client_id'),
+            'building_id'    => $building_id,
             'type_locker_id' => $type_locker_id,
             'name'           => $name,
             'address'        => $address,
@@ -194,6 +196,7 @@ class LockerService
         Log::info("LockerService editLocker " . jsonLog($locker_id));
         $locker = DB::table('locker')
             ->select(
+                'locker.building_id',
                 'locker.locker_id',
                 'locker.name',
                 'locker.address',

@@ -13,33 +13,6 @@ class LockerController extends Controller
         $this->lockerService = $lockerService;
     }
 
-    public function getDashBoardBuilder(Request $request)
-    {
-        Log::info("LockerController dataTable ");
-
-        try {
-            $info = $this->lockerService->bluildingStatus($request->building_id);
-            return response()->json([
-                'meta' => [
-                    'code'    => 200,
-                    'status'  => 'success',
-                    'message' => 'Get locker',
-                ],
-                'data' => $info,
-            ]);
-        } catch (\Throwable $th) {
-            Log::error($th);
-            return response()->json([
-                'meta' => [
-                    'code'    => 500,
-                    'status'  => 'error',
-                    'message' => 'An error has occurred!',
-                ],
-                'data' => null,
-            ]);
-        }
-    }
-
     public function getStatus(Request $request)
     {
         Log::info("LockerController getStatus ");
@@ -143,6 +116,7 @@ class LockerController extends Controller
         Log::info("LockerController store " . jsonLog($request->all()));
         try {
             $locker = $this->lockerService->storeLocker(
+                $request->building_id,
                 $request->locker_id,
                 $request->name,
                 $request->address,
