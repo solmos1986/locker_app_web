@@ -120,7 +120,7 @@ class MovementService
             ->where('movement.building_id', getLocker()->get('building_id'))
             ->first();
 
-        /* if ($verificate_movement) {
+        if ($verificate_movement) {
             $movement_id = DB::table('movement')->insertGetId([
                 "department_id"    => $department_id,
                 "door_id"          => $door_id,
@@ -138,7 +138,7 @@ class MovementService
                 $verificate_movement->id_ref,
                 $movement_id
             );
-        } */
+        }
     }
 
     function sendNotificationWhatsapp($code)
