@@ -72,7 +72,7 @@ class MovementService
             ->where('movement.movement_id', $movement_id)
             ->first();
 
-        /* $this->sendNotificationHolding(
+        $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
@@ -81,7 +81,7 @@ class MovementService
             $movement_id
         );
 
-        $this->sendNotificationWhatsapp($code); */
+        $this->sendNotificationWhatsapp($code);
 
     }
 
@@ -113,7 +113,7 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
-            //->where('movement.id_ref', $id_ref)
+        //->where('movement.id_ref', $id_ref)
             ->where('movement.department_id', $department_id)
             ->where('movement.code', $code)
             ->where('movement.door_id', $door_id)
@@ -141,7 +141,7 @@ class MovementService
         }
     }
 
-    function sendNotificationWhatsapp($code)
+    public function sendNotificationWhatsapp($code)
     {
         Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
         try {
@@ -152,7 +152,7 @@ class MovementService
                 ],
             ]);
 
-            $url = "https://smart-lock.aplus-security.com/movement/$code";
+            $url = env('URL_APP_WHATSAPP') . "/api/v1/movement/$code";
             Log::info("MovementService sendNotificationWhatsapp url " . jsonLog($url));
             $response = $client->request("GET", $url, [
                 'headers' => [
@@ -171,7 +171,7 @@ class MovementService
         }
     }
 
-    function sendNotificationHolding(
+    public function sendNotificationHolding(
         $codigoSizeDoor,
         $nameDepartament,
         $door_id,
@@ -228,7 +228,7 @@ class MovementService
         }
     }
 
-    function modificateNotificationHolding(
+    public function modificateNotificationHolding(
         $codigoSizeDoor,
         $nameDepartament,
         $door_id,
@@ -243,15 +243,18 @@ class MovementService
             $code,
             $id_ref,
         ]));
+
+        $building = DB::table('building')->where('building_id', getLocker()->get('building_id'))->first();
+
         try {
             $client = new \GuzzleHttp\Client();
             $data   = [
                 "id"              => $id_ref,
-                "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
+                "Idcondominio"    => $building->code,
                 "size"            => strtolower($codigoSizeDoor),
                 "deliveryToken"   => $code,
                 "externalOrderId" => "delivery",
-                "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
+                "publicLockerId"  => $building->code,
                 "collectToken"    => $code,
                 "status"          => "collected",
                 "senderId"        => "delivery",

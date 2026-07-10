@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Services\AppMovil\DatabaseService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -8,8 +9,12 @@ use stdClass;
 
 class LockerService
 {
-    public function __construct()
-    {}
+    protected DatabaseService $databaseService;
+
+    public function __construct(DatabaseService $_databaseService)
+    {
+        $this->databaseService = $_databaseService;
+    }
 
     public function getLockerStatus($locker_id)
     {
@@ -181,17 +186,111 @@ class LockerService
         $locker_id,
         $name,
         $address,
-        $type_locker_id
+        $type_locker_id,
+        $size,
+        $fila,
+        $columna
     ) {
-        Log::info("LockerService storeLocker " . jsonLog([$building_id, $locker_id, $name, $address, $type_locker_id]));
+        Log::info("LockerService storeLocker " . jsonLog([
+            $building_id,
+            $locker_id,
+            $name,
+            $address,
+            $type_locker_id,
+            $size,
+            $fila,
+            $columna,
+        ]));
 
-        $insert = DB::table('locker')->insertGetId([
+        $locker_id = DB::table('locker')->insertGetId([
             'building_id'    => $building_id,
             'type_locker_id' => $type_locker_id,
             'name'           => $name,
             'address'        => $address,
+            'size'           => "$fila,$columna",
         ]);
-        return $insert;
+
+        $token = $this->databaseService->getLocker($locker_id);
+
+        $controller_id = DB::table('controller')->insertGetId([
+            'locker_id' => $locker_id,
+            'name'      => "nuevo controlador",
+            'serie'     => "sssss-sss-ssss",
+            'token'     => $token,
+        ]);
+
+        $limit = $fila * $columna;
+        Log::info("LockerService limit " . jsonLog($limit));
+        foreach (getDoor() as $key => $door) {
+            if ($key > $limit - 1) {
+                break;
+            }
+
+            $door_id = DB::table('door')
+                ->insertGetId([
+                    'door_size_id'  => 1,
+                    'controller_id' => $controller_id,
+                    'name'          => $door['name'],
+                    'order'         => $door['order'],
+                ]);
+        }
+
+        $doors = DB::table('door')
+            ->where('controller_id', $controller_id)
+            ->get();
+
+        foreach ($doors as $i => $door) {
+            $open = DB::table('request_comand')
+                ->insertGetId([
+                    'door_id' => $door->door_id,
+                    'comand'  => getComandOpen()[$i]['comand'],
+                    'name'    => getComandOpen()[$i]['name'],
+                ]);
+            $read = DB::table('request_comand')
+                ->insertGetId([
+                    'door_id' => $door->door_id,
+                    'comand'  => getComandRead()[$i]['comand'],
+                    'name'    => getComandRead()[$i]['name'],
+                ]);
+        }
+
+        $request_opened = DB::table('request_comand')
+            ->join('door', 'door.door_id', 'request_comand.door_id')
+            ->where('door.controller_id', $controller_id)
+            ->where('request_comand.name', 'abrir')
+            ->get();
+
+        foreach ($request_opened as $i => $request_opened) {
+            $response_comand_id = DB::table('response_comand')
+                ->insertGetId([
+                    'request_comand_id' => $request_opened->request_comand_id,
+                    'comand'            => getComandOpen()[$i]['comand'],
+                    'name'              => getComandOpen()[$i]['name'],
+                ]);
+        }
+
+        $request_readeds = DB::table('request_comand')
+            ->join('door', 'door.door_id', 'request_comand.door_id')
+            ->where('door.controller_id', $controller_id)
+            ->where('request_comand.name', 'lectura')
+            ->get();
+
+        foreach ($request_readeds as $i => $request_readed) {
+            $response_opened = DB::table('response_comand')
+                ->insertGetId([
+                    'request_comand_id' => $request_readed->request_comand_id,
+                    'comand'            => getComandOpened()[$i]['comand'],
+                    'name'              => getComandOpened()[$i]['name'],
+                ]);
+            $response_closed = DB::table('response_comand')
+                ->insertGetId([
+                    'request_comand_id' => $request_readed->request_comand_id,
+                    'comand'            => getComandClosed()[$i]['comand'],
+                    'name'              => getComandClosed()[$i]['name'],
+                ]);
+        }
+
+        return $locker_id;
     }
 
     public function editLocker($locker_id)
@@ -205,14 +304,18 @@ class LockerService
                 'locker.address',
                 'locker.type_locker_id',
                 'locker.state',
+                'locker.size',
             )
             ->where(
                 "locker_id", $locker_id)
             ->first();
+        $size            = explode(",", $locker->size);
+        $locker->columna = $size[0];
+        $locker->fila    = $size[1];
         return $locker;
     }
 
-    public function updateLocker($locker_id, $name, $address, $type_locker_id)
+    public function updateLocker($locker_id, $name, $address, $type_locker_id, $size)
     {
         Log::info("LockerService updateLocker " . jsonLog([$name, $address, $type_locker_id]));
         $update = DB::table('locker')
@@ -220,6 +323,7 @@ class LockerService
             'type_locker_id' => $type_locker_id,
             'name'           => $name,
             'address'        => $address,
+            'size'           => $size,
         ]);
         $update = $this->editLocker($locker_id);
         return $update;

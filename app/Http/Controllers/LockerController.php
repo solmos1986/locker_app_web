@@ -120,7 +120,10 @@ class LockerController extends Controller
                 $request->locker_id,
                 $request->name,
                 $request->address,
-                $request->type_locker_id
+                $request->type_locker_id,
+                $request->size,
+                $request->fila,
+                $request->columna,
             );
             return response()->json([
                 'meta' => [
@@ -191,7 +194,8 @@ class LockerController extends Controller
                 $request->locker_id,
                 $request->name,
                 $request->address,
-                $request->type_locker_id
+                $request->type_locker_id,
+                $request->size
             );
             return response()->json([
                 'meta' => [

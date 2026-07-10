@@ -79,7 +79,28 @@ class ControllerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        Log::info("ControllerService edit " . jsonLog([$id]));
+        try {
+            $edit = $this->controllerService->editController($id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Controller',
+                ],
+                'data' => $edit,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**

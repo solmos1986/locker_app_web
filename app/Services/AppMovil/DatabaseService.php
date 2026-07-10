@@ -5,6 +5,7 @@ use App\Models\Locker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DatabaseService
 {
@@ -16,12 +17,12 @@ class DatabaseService
         Log::info("DatabaseService GetDataBase locker_id " . jsonLog(getLocker()));
 
         $department = DB::table('department')
-        ->select('department.*')
+            ->select('department.*')
             ->where('department.building_id', getLocker()->get('building_id'))
             ->get();
 
         $lockers = DB::table('locker')
-        ->select('locker.*')
+            ->select('locker.*')
             ->where('locker.locker_id', getLocker()->get('locker_id'))
             ->get();
 
@@ -81,7 +82,18 @@ class DatabaseService
 
     public function getLocker($locker_id)
     {
-        return Locker::where('locker_id', $locker_id)
+        $locker = Locker::where('locker_id', $locker_id)
             ->first();
+        Log::info("DatabaseController locker " . jsonLog($locker));
+        $customClaims = [
+            "locker_id"      => $locker->locker_id,
+            "building_id"    => $locker->building_id,
+            "name"           => $locker->name,
+            "address"        => $locker->address,
+            "type_locker_id" => $locker->type_locker_id,
+            "state"          => $locker->state,
+        ];
+        $token = JWTAuth::customClaims($customClaims)->fromUser($locker, $customClaims);
+        return $token;
     }
 }

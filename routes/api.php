@@ -55,6 +55,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('controller')->group(function () {
         Route::post('/data-table', [ControllerController::class, 'dataTable'])->name('configurations.controller.data-table');
+        Route::get('{id}', [ControllerController::class, 'edit'])->name('configurations.controller.edit');
+        Route::put('{id}', [ControllerController::class, 'update'])->name('configurations.controller.update');
     });
 
     Route::prefix('door')->group(function () {
@@ -102,5 +104,5 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('user-deparment')->group(function () {
         Route::post('/data-table', [UserController::class, 'dataTable'])->name('configurations.user.data-table');
     });
-    
+
 });
