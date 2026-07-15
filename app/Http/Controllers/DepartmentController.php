@@ -45,6 +45,38 @@ class DepartmentController extends Controller
         }
     }
 
+    public function dataTableManager(Request $request)
+    {
+        Log::info("DepartmentController dataTableManager " . jsonLog($request->all()));
+        try {
+            $pageSize    = is_null($request->pageSize) ? 100 : $request->pageSize;
+            $active      = is_null($request->active) ? "id_empresa" : $request->active;
+            $direction   = is_null($request->direction) ? "ASC" : $request->direction;
+            $pageIndex   = is_null($request->pageIndex) ? 0 : $request->pageIndex;
+            $search      = is_null($request->search) ? '' : $request->search;
+            $building_id = is_null($request->building_id) ? '' : $request->building_id;
+            $department  = $this->departamentService->dataTableManager($pageSize, $pageIndex, $active, $direction, $search, $building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -91,5 +123,32 @@ class DepartmentController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function createbyApi(Request $request)
+    {
+        Log::info("DepartmentController createbyApi " . jsonLog($request->all()));
+        try {
+            $this->departamentService->createbyApi($request->building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Actualizado correctamente',
+                ],
+                'data' => null,
+            ]);
+        } catch (\Throwable $th) {
+
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 }

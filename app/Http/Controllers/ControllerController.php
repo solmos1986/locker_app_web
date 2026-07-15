@@ -108,7 +108,28 @@ class ControllerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Log::info("ControllerService update " . jsonLog($request->all()));
+        try {
+            $edit = $this->controllerService->updateController($request->controller_id, $request->name, $request->serie);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Modificado correctamente',
+                ],
+                'data' => null,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**

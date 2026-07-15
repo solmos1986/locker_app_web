@@ -219,6 +219,109 @@ class LockerService
             'token'     => $token,
         ]);
 
+        $this->createAutomaticDoors($fila, $columna, $controller_id);
+
+        return $locker_id;
+    }
+
+    public function editLocker($locker_id)
+    {
+        Log::info("LockerService editLocker " . jsonLog($locker_id));
+        $locker = DB::table('locker')
+            ->select(
+                'locker.building_id',
+                'locker.locker_id',
+                'locker.name',
+                'locker.address',
+                'locker.type_locker_id',
+                'locker.state',
+                'locker.size',
+            )
+            ->where(
+                "locker_id", $locker_id)
+            ->first();
+        $size                        = explode(",", $locker->size);
+        $locker->columna             = $size[0];
+        $locker->fila                = $size[1];
+        $locker->modificar_casillero = false;
+        return $locker;
+    }
+
+    public function updateLocker(
+        bool $modificar_casillero,
+        $building_id,
+        $locker_id,
+        $name,
+        $address,
+        $type_locker_id,
+        $size,
+        $fila,
+        $columna
+    ) {
+        Log::info("LockerService updateLocker " . jsonLog([
+            $building_id,
+            $locker_id,
+            $name,
+            $address,
+            $type_locker_id,
+            $size,
+            $fila,
+            $columna,
+        ]));
+
+        $update = DB::table('locker')
+            ->where('locker.locker_id', $locker_id)->update([
+            'type_locker_id' => $type_locker_id,
+            'name'           => $name,
+            'address'        => $address,
+            'size'           => $size,
+        ]);
+
+        $controller = DB::table('controller')
+            ->where('controller.locker_id', $locker_id)
+            ->first();
+
+        if ($modificar_casillero) {
+            $this->removeAutomaticDoors($controller->controller_id);
+            $this->createAutomaticDoors($fila, $columna, $controller->controller_id);
+        }
+        $update = $this->editLocker($locker_id);
+
+        return $update;
+    }
+
+    public function deleteLocker($locker_id)
+    {
+        Log::info("LockerService deleteLocker " . jsonLog($locker_id));
+        $delete = DB::table('locker')->where(
+            "locker_id", $locker_id)
+            ->delete();
+
+        return $delete;
+    }
+
+    private function removeAutomaticDoors($controller_id)
+    {
+        $deleteResponseComand = DB::table('response_comand')
+            ->join('request_comand', 'request_comand.request_comand_id', 'response_comand.request_comand_id')
+            ->join('door', 'door.door_id', 'request_comand.door_id')
+            ->where('door.controller_id', $controller_id)
+            ->delete();
+        $deleteRequestComand = DB::table('request_comand')
+            ->join('door', 'door.door_id', 'request_comand.door_id')
+            ->where('door.controller_id', $controller_id)
+            ->delete();
+        $deleteDoor = DB::table('door')
+            ->where('door.controller_id', $controller_id)
+            ->delete();
+    }
+
+    private function createAutomaticDoors(
+        $fila,
+        $columna,
+        $controller_id
+    ) {
+
         $limit = $fila * $columna;
         Log::info("LockerService limit " . jsonLog($limit));
         foreach (getDoor() as $key => $door) {
@@ -290,52 +393,5 @@ class LockerService
                 ]);
         }
 
-        return $locker_id;
-    }
-
-    public function editLocker($locker_id)
-    {
-        Log::info("LockerService editLocker " . jsonLog($locker_id));
-        $locker = DB::table('locker')
-            ->select(
-                'locker.building_id',
-                'locker.locker_id',
-                'locker.name',
-                'locker.address',
-                'locker.type_locker_id',
-                'locker.state',
-                'locker.size',
-            )
-            ->where(
-                "locker_id", $locker_id)
-            ->first();
-        $size            = explode(",", $locker->size);
-        $locker->columna = $size[0];
-        $locker->fila    = $size[1];
-        return $locker;
-    }
-
-    public function updateLocker($locker_id, $name, $address, $type_locker_id, $size)
-    {
-        Log::info("LockerService updateLocker " . jsonLog([$name, $address, $type_locker_id]));
-        $update = DB::table('locker')
-            ->where('locker.locker_id', $locker_id)->update([
-            'type_locker_id' => $type_locker_id,
-            'name'           => $name,
-            'address'        => $address,
-            'size'           => $size,
-        ]);
-        $update = $this->editLocker($locker_id);
-        return $update;
-    }
-
-    public function deleteLocker($locker_id)
-    {
-        Log::info("LockerService deleteLocker " . jsonLog($locker_id));
-        $delete = DB::table('locker')->where(
-            "locker_id", $locker_id)
-            ->delete();
-
-        return $delete;
     }
 }
