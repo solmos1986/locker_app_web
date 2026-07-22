@@ -71,6 +71,7 @@ class MovementService
             ->where('movement.building_id', getLocker()->get('building_id'))
             ->where('movement.movement_id', $movement_id)
             ->first();
+        Log::info("MovementService verificate_movement " . jsonLog([$verificate_movement]));
 
         $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
@@ -186,15 +187,20 @@ class MovementService
             $code,
             $id_ref,
         ]));
+
+        $building = DB::table('building')
+            ->where('building.building_id', getLocker()->get('building_id') )
+            ->first();
+
         try {
             $client = new \GuzzleHttp\Client();
             $data   = [
                 "id"              => $id_ref,
-                "Idcondominio"    => env("ID_CONDOMINIO_EXPERIENCE"),
+                "Idcondominio"    => $building->code,
                 "size"            => strtolower($codigoSizeDoor),
                 "deliveryToken"   => $code,
                 "externalOrderId" => "delivery",
-                "publicLockerId"  => env("ID_CONDOMINIO_EXPERIENCE"),
+                "publicLockerId"  => $building->code,
                 "collectToken"    => $code,
                 "status"          => "allocated",
                 "senderId"        => "delivery",
@@ -205,7 +211,7 @@ class MovementService
             ];
             $url = env("URL_APP_EXPERIENCE") . "/api/lockers-v1";
             Log::info("MovementService sendNotificationHolding url " . jsonLog($url));
-            Log::info("MovementService sendNotificationHolding status " . jsonLog($data));
+            Log::info("MovementService sendNotificationHolding data " . jsonLog($data));
             $response = $client->post($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),

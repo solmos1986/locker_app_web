@@ -208,4 +208,60 @@ class DepartmentService
                 ]);
         }
     }
+
+    public function editDepartament($department_id)
+    {
+        Log::info("DepartmentService editDepartament " . jsonLog($department_id));
+        $department = DB::table('department')
+            ->select(
+                'department.department_id',
+                'department.building_id',
+                'department.name',
+                'department.is_api',
+                'department.id_ref',
+                'department.state',
+            )
+            ->where('department.department_id', $department_id)
+            ->first();
+        $users = DB::table('user')
+            ->select(
+                'user.user_id',
+                'user.department_id',
+                'user.name',
+                'user.celular',
+                'user.state',
+            )
+            ->where('user.department_id', $department_id)->get();
+        $department->users = $users;
+        return $department;
+    }
+
+    public function updateDepartament(
+        $department_id,
+        $building_id,
+        $name,
+        $is_api,
+        $id_ref,
+        $state
+    ) {
+        Log::info("DepartmentService updateDepartament " . jsonLog([
+            $department_id,
+            $building_id,
+            $name,
+            $is_api,
+            $id_ref,
+            $state,
+        ]));
+        $department = DB::table('department')
+            ->where('department.department_id', $department_id)
+            ->update(
+                [
+                    "name"   => $name,
+                    "is_api" => $is_api,
+                    "id_ref" => $id_ref,
+                    "state"  => $state,
+                ]
+            );
+        return $department;
+    }
 }

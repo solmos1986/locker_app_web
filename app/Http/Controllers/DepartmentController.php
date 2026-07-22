@@ -104,9 +104,30 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
-        //
+        Log::info("DepartmentController edit " . jsonLog($request->all()));
+        try {
+            $department = $this->departamentService->editDepartament($id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -114,7 +135,35 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Log::info("DepartmentController update " . jsonLog($request->all()));
+        try {
+            $department = $this->departamentService->updateDepartament(
+                $request->department_id,
+                $request->building_id,
+                $request->name,
+                $request->is_api,
+                $request->id_ref,
+                $request->state
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Modificado correctamente',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
