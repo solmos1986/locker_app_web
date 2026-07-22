@@ -49,11 +49,30 @@ class ControllerService
             ->first();
 
         $controller = DB::table('controller')
+            ->select(
+                'controller.controller_id',
+                'controller.locker_id',
+                'controller.name',
+                'controller.serie',
+                'controller.token'
+            )
             ->where('controller.controller_id', $controller_id)
             ->first();
-
-        $controller->locker_id   = $locker->locker_id;
         $controller->building_id = $locker->building_id;
+
+        return $controller;
+    }
+
+    public function updateController(int $controller_id, string $name, string $serie)
+    {
+        Log::info("ControllerService dataTable " . jsonLog([$controller_id]));
+
+        $controller = DB::table('controller')
+            ->where('controller.controller_id', $controller_id)
+            ->update([
+                'name'  => $name,
+                'serie' => $serie,
+            ]);
 
         return $controller;
     }

@@ -188,14 +188,18 @@ class LockerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        Log::info("LockerController update " . jsonLog($id));
+        Log::info("LockerController update " . jsonLog([$id, $request->all()]));
         try {
             $locker = $this->lockerService->updateLocker(
+                $request->modificar_casillero,
+                $request->building_id,
                 $request->locker_id,
                 $request->name,
                 $request->address,
                 $request->type_locker_id,
-                $request->size
+                $request->size,
+                $request->fila,
+                $request->columna,
             );
             return response()->json([
                 'meta' => [
