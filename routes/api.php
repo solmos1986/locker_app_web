@@ -67,6 +67,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('{id}', [DoorController::class, 'edit'])->name('configurations.door.edit');
         Route::put('{id}', [DoorController::class, 'update'])->name('configurations.door.update');
         Route::delete('{id}', [DoorController::class, 'destroy'])->name('configurations.door.destroy');
+        Route::get('open-door/{id}', [DoorController::class, 'openDoor'])->name('configurations.door.open-door');
     });
 
     Route::prefix('movement')->group(function () {

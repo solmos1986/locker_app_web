@@ -189,7 +189,7 @@ class MovementService
         ]));
 
         $building = DB::table('building')
-            ->where('building.building_id', getLocker()->get('building_id') )
+            ->where('building.building_id', getLocker()->get('building_id'))
             ->first();
 
         try {
@@ -250,7 +250,10 @@ class MovementService
             $id_ref,
         ]));
 
-        $building = DB::table('building')->where('building_id', getLocker()->get('building_id'))->first();
+        $building = DB::table('building')
+            ->where('building_id', getLocker()
+                    ->get('building_id'))
+            ->first();
 
         try {
             $client = new \GuzzleHttp\Client();
