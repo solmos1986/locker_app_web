@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\RabbitMQ;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
@@ -137,16 +138,17 @@ class DoorService
 
     public function openDoor($door_id)
     {
-        Log::info("DoorService openDoor " . jsonLog([$door_id]));
+        Log::info("DoorService openDoor " . jsonLog([$door_id, getLocker()]));
         $door = DB::table('door')
             ->where('door_id', $door_id)
             ->first();
         $message = [
-            "door_id"      => $door->door_id,
-            "name"         => $door->name,
-            "door_size_id" => $door->door_size_id,
+            "room_id"     => "1-1",
+            "message"     => "1",
+            "locker_id"   => "1",
+            "building_id" => "1",
         ];
         $message = json_encode($message);
-        $this->rabbitMQ->publish($message);
+        sendSocketMessage('open-door', $message);
     }
 }
