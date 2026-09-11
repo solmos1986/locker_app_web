@@ -26,6 +26,6 @@ class UpdateDateBase extends Command
      */
     public function handle()
     {
-        Log::info("Schedule job: " . jsonLog(['message' => 'This is a scheduled job']));
+        Log::channel('cronJob')->info('Este es un mensaje de prueba.');("Schedule job: " . jsonLog(['message' => 'This is a scheduled job']));
     }
 }
