@@ -94,11 +94,14 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('department')->group(function () {
         Route::post('/data-table', [DepartmentController::class, 'dataTable'])->name('configurations.user.data-table');
+        Route::post('/data-table-manager', [DepartmentController::class, 'dataTableManager'])->name('configurations.user.data-table');
         Route::get('/requeriment', [DepartmentController::class, 'requeriment'])->name('configurations.user.requeriment');
+        Route::post('/create-by-api', [DepartmentController::class, 'createbyApi'])->name('configurations.user.createbyApi');
         Route::post('', [DepartmentController::class, 'store'])->name('configurations.user.store');
         Route::get('{id}', [DepartmentController::class, 'edit'])->name('configurations.user.edit');
         Route::put('{id}', [DepartmentController::class, 'update'])->name('configurations.user.update');
         Route::delete('{id}', [DepartmentController::class, 'destroy'])->name('configurations.user.destroy');
+
     });
 
     Route::prefix('user-deparment')->group(function () {

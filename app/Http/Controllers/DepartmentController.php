@@ -45,6 +45,38 @@ class DepartmentController extends Controller
         }
     }
 
+    public function dataTableManager(Request $request)
+    {
+        Log::info("DepartmentController dataTableManager " . jsonLog($request->all()));
+        try {
+            $pageSize    = is_null($request->pageSize) ? 100 : $request->pageSize;
+            $active      = is_null($request->active) ? "id_empresa" : $request->active;
+            $direction   = is_null($request->direction) ? "ASC" : $request->direction;
+            $pageIndex   = is_null($request->pageIndex) ? 0 : $request->pageIndex;
+            $search      = is_null($request->search) ? '' : $request->search;
+            $building_id = is_null($request->building_id) ? '' : $request->building_id;
+            $department  = $this->departamentService->dataTableManager($pageSize, $pageIndex, $active, $direction, $search, $building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -72,9 +104,30 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
-        //
+        Log::info("DepartmentController edit " . jsonLog($request->all()));
+        try {
+            $department = $this->departamentService->editDepartament($id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Get Movement',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -82,7 +135,35 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        Log::info("DepartmentController update " . jsonLog($request->all()));
+        try {
+            $department = $this->departamentService->updateDepartament(
+                $request->department_id,
+                $request->building_id,
+                $request->name,
+                $request->is_api,
+                $request->id_ref,
+                $request->state
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Modificado correctamente',
+                ],
+                'data' => $department,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 
     /**
@@ -91,5 +172,32 @@ class DepartmentController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function createbyApi(Request $request)
+    {
+        Log::info("DepartmentController createbyApi " . jsonLog($request->all()));
+        try {
+            $this->departamentService->createbyApi($request->building_id);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Actualizado correctamente',
+                ],
+                'data' => null,
+            ]);
+        } catch (\Throwable $th) {
+
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
     }
 }
