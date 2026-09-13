@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use function Laravel\Prompts\select;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -69,7 +70,18 @@ class BuildingService
 
     public function listBuild()
     {
-        Log::info("BuildingService listBuild " . jsonLog([]));
+        Log::info("BuildingService listBuild " . jsonLog(Auth::user()->id));
+        $permisos_building = DB::table('users_rol')
+            ->select(
+                'users_rol_building.building_id'
+            )
+            ->join('users', 'users.id', '=', 'users_rol.users_id')
+            ->join('users_rol_building', 'users_rol_building.users_rol_id', 'users_rol.users_rol_id')
+            ->where('users.id', Auth::user()->id)
+            ->get()
+            ->pluck('building_id');
+
+        Log::info("BuildingService permisos " . jsonLog($permisos_building));
         $buildings = DB::table('building')
             ->select(
                 'building.building_id',
@@ -80,6 +92,7 @@ class BuildingService
             )
             ->join('company', 'company.company_id', 'building.company_id')
             ->where('company.company_id', 1)
+            ->whereIn('building.building_id', $permisos_building)
             ->get();
         $users = DB::table('users')
             ->select(
