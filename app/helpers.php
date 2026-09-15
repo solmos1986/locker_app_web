@@ -2,6 +2,7 @@
 
 use ElephantIO\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -41,6 +42,35 @@ if (! function_exists('sizeDoor')) {
             return env('SIZE_DOOR_LARGE');
         }
         return env('SIZE_DOOR_SMALL');
+    }
+}
+
+if (! function_exists('currentUser')) {
+    function currentUser()
+    {
+        JWTAuth::parseToken()->authenticate();
+        Auth::user()->id;
+        $user = DB::table('users')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.celular',
+            )
+            ->where('id', Auth::user()->id)
+            ->first();
+        $roles = DB::table('users_rol')
+            ->select(
+                'users_rol.users_rol_id',
+                'users_rol.rol_id',
+                'rol.name',
+            )
+            ->join('rol', 'rol.rol_id', 'users_rol.rol_id')
+            ->where('users_rol.users_id', Auth::user()->id)
+            ->get();
+        
+        $user->roles = $roles;
+        return $user;
     }
 }
 
@@ -669,7 +699,7 @@ if (! function_exists('sendSocketMessage')) {
             ]);
 
             $client->connect();
-            $client->of($namespace);
+            //$client->of($namespace);
             $client->emit($event, $data);
             $client->disconnect();
 

@@ -2,7 +2,6 @@
 namespace App\Services;
 
 use App\RabbitMQ;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
@@ -140,15 +139,33 @@ class DoorService
     {
         Log::info("DoorService openDoor " . jsonLog([$door_id, getLocker()]));
         $door = DB::table('door')
+            ->select('door.*', 'locker.locker_id', 'locker.building_id')
+            ->join('controller', 'controller.controller_id', '=', 'door.controller_id')
+            ->join('locker', 'locker.locker_id', '=', 'controller.locker_id')
             ->where('door_id', $door_id)
             ->first();
         $message = [
-            "room_id"     => "1-1",
-            "message"     => "1",
-            "locker_id"   => "1",
-            "building_id" => "1",
+            "room_id"     => "$door->locker_id-$door->building_id",
+            "message"     => $door_id,
+            "locker_id"   => 1,
+            "building_id" => 1,
         ];
-        $message = json_encode($message);
-        sendSocketMessage('open-door', $message);
+        //$message = json_encode($message);
+        sendSocketMessage('open_door', $message);
+    }
+
+    public function updateDatabase($id_locker)
+    {
+        Log::info("DoorService updateDatabase " . jsonLog(getLocker()));
+        $locker = DB::table('locker')
+            ->where('locker.locker_id', $id_locker)
+            ->first();
+        $message = [
+            "room_id"     => "$locker->locker_id-$locker->building_id",
+            "message"     => $id_locker,
+            "locker_id"   => 1,
+            "building_id" => 1,
+        ];
+        sendSocketMessage('update_data_base', $message);
     }
 }

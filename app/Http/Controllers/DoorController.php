@@ -270,9 +270,34 @@ class DoorController extends Controller
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
-                    'message' => 'Eliminado correctamente',
+                    'message' => 'Solicitud de apertura enviada',
                 ],
                 'data' => $door,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+    public function updateDatabase(Request $request, $id_locker)
+    {
+        Log::info("DoorController updateDatabase " . jsonLog($request->all()));
+        try {
+            $this->doorService->updateDatabase($id_locker);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Base de datos actualizada',
+                ],
+                'data' => null,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);
