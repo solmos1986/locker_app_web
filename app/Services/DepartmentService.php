@@ -109,21 +109,28 @@ class DepartmentService
     public function createbyApi($building_id)
     {
         $departaments = $this->getDepatamentResidentesByApi($building_id);
-        $this->insertDepartamentResident($departaments, $building_id);
+        DB::transaction(function () use ($departaments, $building_id) {
+            $this->insertDepartamentResident($departaments, $building_id);
+        });
     }
 
     private function getDepatamentResidentesByApi($building_id)
     {
-        Log::info("DepartmentService createbyApi " . jsonLog(getUser()));
-
-        $building = DB::table('building')
-            ->where('building_id', $building_id)
-            ->first();
+        Log::info("DepartmentService/getDepatamentResidentesByApi " . jsonLog(getUser()));
 
         try {
+
+            $building = DB::table('building')
+                ->where('building_id', $building_id)
+                ->first();
+
+            if (is_null($building)) {
+                throw new \RuntimeException("Edificio {$building_id} no encontrado");
+            }
+
             $client = new \GuzzleHttp\Client();
             $url    = env("URL_APP_EXPERIENCE") . "/api/v1/building/department-list/" . $building->buildingName . "?all=true";
-            Log::info("DepartmentService sendNotificationHolding url " . jsonLog($url));
+            Log::info("DepartmentService/getDepatamentResidentesByApi url " . jsonLog($url));
             $response = $client->get($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . env("TOKEN_EXPERIENCE"),
@@ -131,8 +138,8 @@ class DepartmentService
                     'Accept'        => '*/*',
                 ],
             ]);
-            Log::info("DepartmentService sendNotificationHolding status " . jsonLog($response->getStatusCode()));
-            Log::info("DepartmentService sendNotificationHolding response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
+            Log::info("DepartmentService/getDepatamentResidentesByApi status " . jsonLog($response->getStatusCode()));
+            Log::info("DepartmentService/getDepatamentResidentesByApi response " . jsonLog(json_decode($response->getBody()->getContents(), true)));
             $data = json_decode($response->getBody());
 
             $departaments = [];
@@ -154,11 +161,12 @@ class DepartmentService
                     'users'  => $users,
                 ];
             }
-            Log::info("DepartmentService sendNotificationHolding departaments " . jsonLog($departaments));
+            Log::info("DepartmentService/getDepatamentResidentesByApi departaments " . jsonLog($departaments));
             return $departaments;
         } catch (\Throwable $th) {
             Log::error($th);
-            Log::error("DepartmentService sendNotificationHolding error al notificar al servidor");
+            Log::error("DepartmentService/getDepatamentResidentesByApi error al notificar al servidor");
+            throw new \RuntimeException("No se pudo obtener los departamentos desde la API externa: " . $th->getMessage(), 0, $th);
         }
     }
 
@@ -168,6 +176,7 @@ class DepartmentService
         foreach ($departaments as $key => $departament) {
             $vefied_department = DB::table('department')
                 ->where('department.id_ref', $departament['id_ref'])
+                ->where('department.building_id', $building_id)
                 ->first();
 
             if ($vefied_department != null) {

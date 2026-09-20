@@ -1,18 +1,15 @@
 <?php
 namespace App\Services;
 
-use App\RabbitMQ;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class DoorService
 {
-    protected RabbitMQ $rabbitMQ;
+
     public function __construct(
-        RabbitMQ $rabbitMQ
     ) {
-        $this->rabbitMQ = $rabbitMQ;
     }
 
     public function dataTable($locker_id, $pageSize, $pageIndex, $active, $direction, $search)

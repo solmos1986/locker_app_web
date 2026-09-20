@@ -55,8 +55,9 @@ Note: `AuthController::login` looks the user up by email only and does not verif
 
 ### External integrations
 
-- **RabbitMQ** (`app/RabbitMQ.php`, `MQ_*` env): `publish()` sends a JSON message to the `open` queue to physically open a door. Called from `DoorService::openDoor()`.
+- **Socket.io** (`URL_SOCKET_IO` env): `sendSocketMessage($event, $data)` in `app/helpers.php` connects to the socket server, emits one event, and disconnects (returns `false` and logs on failure — it never throws). `DoorService::openDoor()` emits `open_door` and `updateDatabase()` emits `update_data_base`, both to room `"{locker_id}-{building_id}"`; the physical locker listens on that room. This replaced RabbitMQ (`app/RabbitMQ.php` and `MQ_*` env were removed; `php-amqplib` is still in `composer.json` but unused).
 - **"Experience" system** (`URL_APP_EXPERIENCE`, `TOKEN_EXPERIENCE` env): Guzzle HTTP calls to import buildings/departments/residents (`DepartmentService::createbyApi`) and push movement notifications (`app/Services/AppMovil/MovementService.php`).
+- **WhatsApp API** (`URL_APP_WHATSAPP` env): `MovementService` (AppMovil) calls `/api/v1/movement/{code}` on it.
 - **Telescope** — registered only in `local` environment.
 
 Queue, cache, and session all use the `database` driver.
@@ -73,5 +74,5 @@ Vite + Tailwind CSS v4 + Alpine.js + plain TypeScript (no framework). Libraries:
 ## Conventions
 
 - Code, log strings, response messages, and git branch names mix Spanish and English.
-- `.env` is committed and contains real credentials (DB, `JWT_SECRET`, RabbitMQ, `TOKEN_EXPERIENCE`) — treat these as live secrets; do not echo them into new files or external requests.
+- `.env` is committed and contains real credentials (DB, `JWT_SECRET`, `TOKEN_EXPERIENCE`) — treat these as live secrets; do not echo them into new files or external requests.
 - DataTable endpoints take `pageSize`/`pageIndex`/`active`/`direction`/`search` and return `{ paginate, sort, <collection> }`.
