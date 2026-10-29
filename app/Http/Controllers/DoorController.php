@@ -130,6 +130,48 @@ class DoorController extends Controller
         //
     }
 
+    public function openManual(Request $request, string $id)
+    {
+        Log::info("DoorController openManual " . jsonLog([$id, $request->all()]));
+        $request->validate([
+            'tipo'        => 'required|in:mantenimiento,limpieza,intervencion',
+            'observacion' => 'required|string|max:255',
+        ]);
+        try {
+            $door_event_id = $this->doorService->openManual($id, $request->tipo, $request->observacion);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => $request->tipo === 'intervencion'
+                        ? 'Casillero intervenido y liberado'
+                        : 'Solicitud de apertura enviada',
+                ],
+                'data' => $door_event_id,
+            ]);
+        } catch (\RuntimeException $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 400,
+                    'status'  => 'error',
+                    'message' => $th->getMessage(),
+                ],
+                'data' => null,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
