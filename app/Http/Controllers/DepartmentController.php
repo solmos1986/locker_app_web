@@ -178,14 +178,14 @@ class DepartmentController extends Controller
     {
         Log::info("DepartmentController createbyApi " . jsonLog($request->all()));
         try {
-            $this->departamentService->createbyApi($request->building_id);
+            $resumen = $this->departamentService->createbyApi($request->building_id);
             return response()->json([
                 'meta' => [
                     'code'    => 200,
                     'status'  => 'success',
                     'message' => 'Actualizado correctamente',
                 ],
-                'data' => null,
+                'data' => $resumen,
             ]);
         } catch (\Throwable $th) {
 
