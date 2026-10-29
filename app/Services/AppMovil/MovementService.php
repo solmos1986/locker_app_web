@@ -74,7 +74,7 @@ class MovementService
             ->first();
         Log::info("MovementService verificate_movement " . jsonLog([$verificate_movement]));
 
-       /*  $this->sendNotificationHolding(
+        $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
@@ -83,7 +83,7 @@ class MovementService
             $movement_id
         );
 
-        $this->sendNotificationWhatsapp($code); */
+        $this->sendNotificationWhatsapp($code);
 
     }
 

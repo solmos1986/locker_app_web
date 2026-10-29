@@ -27,9 +27,10 @@ class MovementService
                 DB::raw("GROUP_CONCAT( IF(movement.status_integrate=1, 'si', 'no') SEPARATOR ' / ') as status_integrate"),
             )
             ->join('door', 'door.door_id', 'movement.door_id')
+            ->join('controller', 'controller.controller_id', 'door.controller_id')
             ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
             ->join('department', 'department.department_id', 'movement.department_id')
-            ->where('movement.building_id', $locker_id) //getUser()->get('client_id')
+            ->where('controller.locker_id', $locker_id)
             ->groupBy(
                 'movement.id_ref',
             )
