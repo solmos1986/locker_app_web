@@ -96,7 +96,7 @@ class LockerService
                     'movement.movement_id',
                     'movement.id_ref',
                     'movement.door_id',
-                    DB::raw('DATE_FORMAT(movement.update_at, "%Y/%m/%s %H:%i:%s") as update_at'),
+                    DB::raw('DATE_FORMAT(movement.update_at, "%Y/%m/%d %H:%i:%s") as update_at'),
                     'type_movement.name'
                 )
                 ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
