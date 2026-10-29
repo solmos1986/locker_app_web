@@ -49,6 +49,8 @@ class MovementService
             "code"             => $code,
             "type_movement_id" => 1,
         ]);
+        // La puerta queda ocupada hasta el retiro; la tablet copia este estado al sincronizar.
+        DB::table('door')->where('door_id', $door_id)->update(['state' => 0]);
 
         $verificate_movement = DB::table('movement')
             ->select(
@@ -148,6 +150,7 @@ class MovementService
                 "code"             => $code,
                 "type_movement_id" => 2,
             ]);
+            DB::table('door')->where('door_id', $door_id)->update(['state' => 1]);
 
             $this->modificateNotificationHolding(
                 $verificate_movement->codigoSizeDoor,

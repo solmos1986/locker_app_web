@@ -24,7 +24,8 @@ class LockerService
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('controller', 'controller.controller_id', 'door.controller_id')
             ->where('controller.locker_id', $locker_id)
-            ->where('movement.building_id', 1) //getUser()->get('client_id')
+            // Una fila por envío (id_ref), igual que la grilla de Actividad.
+            ->groupBy('movement.id_ref')
             ->get();
 
         $depataments = DB::table('department')
@@ -95,7 +96,8 @@ class LockerService
                     'movement.movement_id',
                     'movement.id_ref',
                     'movement.door_id',
-                    DB::raw('DATE_FORMAT(movement.update_at, "%Y/%m/%s %H:%i:%s") as update_at'),
+                    // En UTC y sin formatear: el panel la convierte a la hora local.
+                    'movement.update_at',
                     'type_movement.name'
                 )
                 ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')

@@ -57,6 +57,9 @@ return [
             'prefix_indexes' => true,
             'strict' => false,
             'engine' => null,
+            // Los create_at/update_at los genera MySQL (CURRENT_TIMESTAMP); se guardan en UTC
+            // sin importar la zona del servidor (producción está en CET). Ver scritps/update_1.4.sql.
+            'timezone' => env('DB_TIMEZONE', '+00:00'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
