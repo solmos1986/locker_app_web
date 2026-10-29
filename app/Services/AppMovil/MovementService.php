@@ -104,7 +104,7 @@ class MovementService
 
         $building_id = getLocker()->get('building_id');
 
-        // Busca la entrega (tipo 1) pendiente, es decir, sin un retiro (tipo 2) para el mismo id_ref.
+        // Busca la entrega (tipo 1) pendiente, es decir, sin un retiro (2) ni intervención (4) para el mismo id_ref.
         $pendingQuery = fn() => DB::table('movement')
             ->select(
                 'movement.id_ref',
@@ -129,7 +129,7 @@ class MovementService
                 $query->select(DB::raw(1))
                     ->from('movement as retiro')
                     ->whereColumn('retiro.id_ref', 'movement.id_ref')
-                    ->where('retiro.type_movement_id', 2);
+                    ->whereIn('retiro.type_movement_id', [2, 4]);
             })
             ->orderByDesc('movement.movement_id');
 
@@ -261,7 +261,8 @@ class MovementService
         $door_id,
         $code,
         $id_ref,
-        $movement_id
+        $movement_id,
+        $building_id = null
     ) {
         Log::info("MovementService modificateNotificationHolding " . jsonLog([
             $codigoSizeDoor,
@@ -269,11 +270,12 @@ class MovementService
             $door_id,
             $code,
             $id_ref,
+            $building_id,
         ]));
 
+        // Desde el panel (intervención) no hay token de locker: el edificio llega por parámetro.
         $building = DB::table('building')
-            ->where('building_id', getLocker()
-                    ->get('building_id'))
+            ->where('building_id', $building_id ?? getLocker()->get('building_id'))
             ->first();
 
         try {

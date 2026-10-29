@@ -164,8 +164,28 @@ class LockerService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->first();
-        $detailed_activity->entrada = $entrada;
-        $detailed_activity->salida  = $salida;
+        $intervenido = DB::table('movement')
+            ->select(
+                'department.name as departament',
+                'door.name as door',
+                'movement.id_ref',
+                'movement.status_integrate',
+                'movement.status_notificate',
+                'type_movement.name as type_movement',
+                'movement.create_at',
+                'movement.observacion',
+                'users.name as usuario'
+            )
+            ->where('movement.id_ref', $id_ref)
+            ->where('movement.type_movement_id', 4)
+            ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
+            ->join('department', 'department.department_id', 'movement.department_id')
+            ->join('door', 'door.door_id', 'movement.door_id')
+            ->leftJoin('users', 'users.id', 'movement.users_id')
+            ->first();
+        $detailed_activity->entrada     = $entrada;
+        $detailed_activity->salida      = $salida;
+        $detailed_activity->intervenido = $intervenido;
         return $detailed_activity;
     }
 
