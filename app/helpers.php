@@ -1,6 +1,9 @@
 <?php
 
+use ElephantIO\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 if (! function_exists('jsonLog')) {
@@ -39,6 +42,35 @@ if (! function_exists('sizeDoor')) {
             return env('SIZE_DOOR_LARGE');
         }
         return env('SIZE_DOOR_SMALL');
+    }
+}
+
+if (! function_exists('currentUser')) {
+    function currentUser()
+    {
+        JWTAuth::parseToken()->authenticate();
+        Auth::user()->id;
+        $user = DB::table('users')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.celular',
+            )
+            ->where('id', Auth::user()->id)
+            ->first();
+        $roles = DB::table('users_rol')
+            ->select(
+                'users_rol.users_rol_id',
+                'users_rol.rol_id',
+                'rol.name',
+            )
+            ->join('rol', 'rol.rol_id', 'users_rol.rol_id')
+            ->where('users_rol.users_id', Auth::user()->id)
+            ->get();
+        
+        $user->roles = $roles;
+        return $user;
     }
 }
 
@@ -635,5 +667,48 @@ if (! function_exists('getComandClosed')) {
                 'name'   => 'cerrado',
             ],
         ];
+    }
+}
+
+if (! function_exists('sendSocketMessage')) {
+    /**
+     * Cliente de Socket.io: conecta al servidor configurado en URL_SOCKET_IO,
+     * emite un evento con su payload y cierra la conexión.
+     *
+     * Permite que un endpoint REST notifique en tiempo real a los clientes
+     * conectados por socket (dashboard, app movil, lockers, etc).
+     *
+     * @param  string $event     Nombre del evento a emitir (ej: 'door-opened').
+     * @param  mixed  $data      Payload a enviar junto al evento.
+     * @param  string $namespace Namespace de socket.io al que conectarse.
+     * @return bool              true si el mensaje se envio correctamente.
+     */
+    function sendSocketMessage($event, $data, $namespace = '/'): bool
+    {
+        Log::info("sendSocketMessage " . jsonLog([
+            'event'     => $event,
+            'data'      => $data,
+            'namespace' => $namespace,
+        ]));
+
+        $url = env('URL_SOCKET_IO');
+
+        try {
+            $client = Client::create($url, [
+                'client' => Client::CLIENT_4X,
+            ]);
+
+            $client->connect();
+            //$client->of($namespace);
+            $client->emit($event, $data);
+            $client->disconnect();
+
+            Log::info("sendSocketMessage enviado correctamente a $url");
+            return true;
+        } catch (\Throwable $th) {
+            Log::error("sendSocketMessage error al enviar mensaje por socket.io");
+            Log::error($th);
+            return false;
+        }
     }
 }

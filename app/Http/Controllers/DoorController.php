@@ -18,7 +18,7 @@ class DoorController extends Controller
 
     public function dataTable(Request $request)
     {
-        Log::info("ControllerController dataTable " . jsonLog($request->all()));
+        Log::info("DoorController dataTable " . jsonLog($request->all()));
         try {
             $pageSize  = is_null($request->pageSize) ? 100 : $request->pageSize;
             $active    = is_null($request->active) ? "controller_id" : $request->active;
@@ -49,7 +49,7 @@ class DoorController extends Controller
 
     public function requirement(Request $request)
     {
-        Log::info("ControllerController dataTable " . jsonLog($request->all()));
+        Log::info("DoorController dataTable " . jsonLog($request->all()));
         try {
             $requirement = $this->doorService->requirement($request->locker_id);
             return response()->json([
@@ -91,7 +91,7 @@ class DoorController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info("ControllerController store " . jsonLog($request->all()));
+        Log::info("DoorController store " . jsonLog($request->all()));
         try {
             $door = $this->doorService->storeDoor(
                 $request->door_id,
@@ -135,7 +135,7 @@ class DoorController extends Controller
      */
     public function open(string $id)
     {
-        Log::info("ControllerController open " . jsonLog($id));
+        Log::info("DoorController open " . jsonLog($id));
         try {
             $door = $this->doorService->openDoor(
                 $id,
@@ -166,7 +166,7 @@ class DoorController extends Controller
      */
     public function edit(Request $request, string $id)
     {
-        Log::info("ControllerController edit " . jsonLog($request->all([])));
+        Log::info("DoorController edit " . jsonLog($request->all([])));
         try {
             $door = $this->doorService->editeDoor(
                 $id,
@@ -197,7 +197,7 @@ class DoorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        Log::info("ControllerController update " . jsonLog($request->all()));
+        Log::info("DoorController update " . jsonLog($request->all()));
         try {
             $door = $this->doorService->updateDoor(
                 $request->door_id,
@@ -233,7 +233,7 @@ class DoorController extends Controller
      */
     public function destroy(string $id)
     {
-        Log::info("ControllerController destroy " . jsonLog($id));
+        Log::info("DoorController destroy " . jsonLog($id));
         try {
             $door = $this->doorService->deleteDoor(
                 $id,
@@ -245,6 +245,59 @@ class DoorController extends Controller
                     'message' => 'Eliminado correctamente',
                 ],
                 'data' => $door,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+
+    public function openDoor(Request $request)
+    {
+        Log::info("DoorController openDoor " . jsonLog($request->all()));
+        try {
+            $door = $this->doorService->openDoor(
+                $request->door_id,
+            );
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Solicitud de apertura enviada',
+                ],
+                'data' => $door,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th);
+            return response()->json([
+                'meta' => [
+                    'code'    => 500,
+                    'status'  => 'error',
+                    'message' => 'An error has occurred!',
+                ],
+                'data' => null,
+            ]);
+        }
+    }
+    public function updateDatabase(Request $request, $id_locker)
+    {
+        Log::info("DoorController updateDatabase " . jsonLog($request->all()));
+        try {
+            $this->doorService->updateDatabase($id_locker);
+            return response()->json([
+                'meta' => [
+                    'code'    => 200,
+                    'status'  => 'success',
+                    'message' => 'Base de datos actualizada',
+                ],
+                'data' => null,
             ]);
         } catch (\Throwable $th) {
             Log::error($th);

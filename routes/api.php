@@ -61,12 +61,15 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('door')->group(function () {
         Route::post('/requirement', [DoorController::class, 'requirement'])->name('configurations.door.requirement');
+        Route::get('update-database/{id_locker}', [DoorController::class, 'updateDatabase'])->name('configurations.door.update-database');
         Route::post('/data-table', [DoorController::class, 'dataTable'])->name('configurations.door.data-table');
         Route::get('/open/{id}', [DoorController::class, 'open'])->name('configurations.door.open');
         Route::post('', [DoorController::class, 'store'])->name('configurations.door.store');
         Route::get('{id}', [DoorController::class, 'edit'])->name('configurations.door.edit');
         Route::put('{id}', [DoorController::class, 'update'])->name('configurations.door.update');
         Route::delete('{id}', [DoorController::class, 'destroy'])->name('configurations.door.destroy');
+        Route::get('open-door/{id}', [DoorController::class, 'openDoor'])->name('configurations.door.open-door');
+
     });
 
     Route::prefix('movement')->group(function () {

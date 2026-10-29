@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mysql-holding": {
+      "command": "node",
+      "args": [".claude/mcp-mysql-holding.mjs"]
+    }
+  }
+}

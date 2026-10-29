@@ -70,18 +70,14 @@ class BuildingService
 
     public function listBuild()
     {
-        Log::info("BuildingService listBuild " . jsonLog(Auth::user()->id));
-        $permisos_building = DB::table('users_rol')
-            ->select(
-                'users_rol_building.building_id'
-            )
-            ->join('users', 'users.id', '=', 'users_rol.users_id')
-            ->join('users_rol_building', 'users_rol_building.users_rol_id', 'users_rol.users_rol_id')
-            ->where('users.id', Auth::user()->id)
-            ->get()
-            ->pluck('building_id');
+        Log::info("BuildingService listBuild " . jsonLog([Auth::user()->id, getUser()]));
 
-        Log::info("BuildingService permisos " . jsonLog($permisos_building));
+        $users_rol_id = [];
+        foreach (currentUser()->roles as $key => $users_rol) {
+            $users_rol_id[] = $users_rol->users_rol_id;
+        }
+
+        Log::info("BuildingService permisos " . jsonLog($users_rol_id));
         $buildings = DB::table('building')
             ->select(
                 'building.building_id',
@@ -91,20 +87,15 @@ class BuildingService
                 'building.address'
             )
             ->join('company', 'company.company_id', 'building.company_id')
+            ->join('users_rol_building', 'users_rol_building.building_id', 'building.building_id')
             ->where('company.company_id', 1)
-            ->whereIn('building.building_id', $permisos_building)
+            ->whereIn('users_rol_building.users_rol_id', $users_rol_id)
+            ->distinct()
             ->get();
-        $users = DB::table('users')
-            ->select(
-                'id',
-                'name',
-                'email',
-                'celular',
-            )
-            ->get();
+
         return [
             'buildings' => $buildings,
-            'users'     => $users,
+            'users'     => currentUser(),
         ];
     }
 

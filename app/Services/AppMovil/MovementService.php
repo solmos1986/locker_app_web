@@ -36,7 +36,8 @@ class MovementService
 
     public function storeMovement($department_id, $door_id, $code, $id_ref)
     {
-        $id_ref = Str::uuid()->toString();
+        // Se respeta el id_ref de la tablet para que la BD local y el servidor compartan el mismo envío.
+        $id_ref = empty($id_ref) ? Str::uuid()->toString() : $id_ref;
         Log::info("MovementService storeMovement " . jsonLog([$department_id, $door_id, $code, $id_ref]));
         Log::info("MovementService storeMovement getLocker " . jsonLog(getLocker()));
 
@@ -73,7 +74,7 @@ class MovementService
             ->first();
         Log::info("MovementService verificate_movement " . jsonLog([$verificate_movement]));
 
-        $this->sendNotificationHolding(
+       /*  $this->sendNotificationHolding(
             $verificate_movement->codigoSizeDoor,
             $verificate_movement->nameDepartament,
             $verificate_movement->door_id,
@@ -82,7 +83,7 @@ class MovementService
             $movement_id
         );
 
-        $this->sendNotificationWhatsapp($code);
+        $this->sendNotificationWhatsapp($code); */
 
     }
 
@@ -99,7 +100,10 @@ class MovementService
             $id_ref,
         ]));
 
-        $verificate_movement = DB::table('movement')
+        $building_id = getLocker()->get('building_id');
+
+        // Busca la entrega (tipo 1) pendiente, es decir, sin un retiro (tipo 2) para el mismo id_ref.
+        $pendingQuery = fn() => DB::table('movement')
             ->select(
                 'movement.id_ref',
                 'movement.department_id',
@@ -114,19 +118,33 @@ class MovementService
             ->join('department', 'department.department_id', 'movement.department_id')
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('door_size', 'door_size.door_size_id', 'door.door_size_id')
-        //->where('movement.id_ref', $id_ref)
+            ->where('movement.type_movement_id', 1)
             ->where('movement.department_id', $department_id)
             ->where('movement.code', $code)
             ->where('movement.door_id', $door_id)
-            ->where('movement.building_id', getLocker()->get('building_id'))
-            ->first();
+            ->where('movement.building_id', $building_id)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('movement as retiro')
+                    ->whereColumn('retiro.id_ref', 'movement.id_ref')
+                    ->where('retiro.type_movement_id', 2);
+            })
+            ->orderByDesc('movement.movement_id');
+
+        // Primero por id_ref; si no coincide (entregas creadas antes de compartir el id_ref
+        // con la tablet), por departamento + puerta + código.
+        $verificate_movement = empty($id_ref)
+            ? null
+            : $pendingQuery()->where('movement.id_ref', $id_ref)->first();
+        $verificate_movement = $verificate_movement ?? $pendingQuery()->first();
+        Log::info("MovementService updateMovement verificate_movement " . jsonLog([$verificate_movement]));
 
         if ($verificate_movement) {
             $movement_id = DB::table('movement')->insertGetId([
                 "department_id"    => $department_id,
                 "door_id"          => $door_id,
                 "id_ref"           => $verificate_movement->id_ref,
-                "building_id"      => getLocker()->get('building_id'),
+                "building_id"      => $building_id,
                 "code"             => $code,
                 "type_movement_id" => 2,
             ]);
@@ -189,7 +207,7 @@ class MovementService
         ]));
 
         $building = DB::table('building')
-            ->where('building.building_id', getLocker()->get('building_id') )
+            ->where('building.building_id', getLocker()->get('building_id'))
             ->first();
 
         try {
@@ -250,7 +268,10 @@ class MovementService
             $id_ref,
         ]));
 
-        $building = DB::table('building')->where('building_id', getLocker()->get('building_id'))->first();
+        $building = DB::table('building')
+            ->where('building_id', getLocker()
+                    ->get('building_id'))
+            ->first();
 
         try {
             $client = new \GuzzleHttp\Client();
