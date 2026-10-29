@@ -109,9 +109,37 @@ class DepartmentService
     public function createbyApi($building_id)
     {
         $departaments = $this->getDepatamentResidentesByApi($building_id);
-        DB::transaction(function () use ($departaments, $building_id) {
-            $this->insertDepartamentResident($departaments, $building_id);
+        if (empty($departaments)) {
+            // Una respuesta vacía de la API eliminaría todos los departamentos del edificio.
+            throw new \RuntimeException("La API no devolvió departamentos para el edificio {$building_id}; no se modificó nada");
+        }
+        $resumen      = DB::transaction(function () use ($departaments, $building_id) {
+            return $this->insertDepartamentResident($departaments, $building_id);
         });
+        Log::info("DepartmentService createbyApi resumen " . jsonLog($resumen));
+
+        $this->notificarLockers($building_id);
+        return $resumen;
+    }
+
+    /**
+     * Avisa a las tablets del edificio que resincronicen su BD local; de lo contrario
+     * seguirían ofreciendo departamentos que ya no existen en el servidor.
+     */
+    private function notificarLockers($building_id)
+    {
+        $lockers = DB::table('locker')
+            ->where('locker.building_id', $building_id)
+            ->get();
+
+        foreach ($lockers as $locker) {
+            sendSocketMessage('update_data_base', [
+                "room_id"     => "$locker->locker_id-$locker->building_id",
+                "message"     => $locker->locker_id,
+                "locker_id"   => $locker->locker_id,
+                "building_id" => $locker->building_id,
+            ]);
+        }
     }
 
     private function getDepatamentResidentesByApi($building_id)
@@ -170,9 +198,20 @@ class DepartmentService
         }
     }
 
+    /**
+     * Reemplaza los departamentos del edificio por los que trae la API:
+     * - los que coinciden por id_ref se actualizan y reactivan;
+     * - los nuevos se crean;
+     * - los que ya no vienen en la API se eliminan, salvo que tengan movimientos:
+     *   esos se desactivan (state = 0), porque borrarlos eliminaría en cascada
+     *   sus entregas/retiros (FK movement.department_id ON DELETE CASCADE).
+     */
     private function insertDepartamentResident($departaments, $building_id)
     {
         Log::info("DepartmentService insertDepartamentResident " . jsonLog($departaments));
+        $sincronizados = [];
+        $resumen       = ['actualizados' => 0, 'creados' => 0, 'eliminados' => 0, 'desactivados' => 0];
+
         foreach ($departaments as $key => $departament) {
             $vefied_department = DB::table('department')
                 ->where('department.id_ref', $departament['id_ref'])
@@ -184,9 +223,13 @@ class DepartmentService
                 DB::table('department')
                     ->where('department.department_id', $vefied_department->department_id)
                     ->update([
-                        'name' => $departament['name'],
+                        'name'   => $departament['name'],
+                        'is_api' => $departament['is_api'],
+                        'state'  => 1,
                     ]);
                 $this->insertResidente($departament['users'], $vefied_department->department_id);
+                $sincronizados[] = $vefied_department->department_id;
+                $resumen['actualizados']++;
             } else {
                 Log::info("DepartmentService insert " . jsonLog($vefied_department));
                 $insert_department = DB::table('department')
@@ -197,9 +240,34 @@ class DepartmentService
                         'building_id' => $building_id,
                     ]);
                 $this->insertResidente($departament['users'], $insert_department);
+                $sincronizados[] = $insert_department;
+                $resumen['creados']++;
             }
 
         }
+
+        $sobrantes = DB::table('department')
+            ->select('department.department_id')
+            ->selectRaw('EXISTS (SELECT 1 FROM movement WHERE movement.department_id = department.department_id) AS con_movimientos')
+            ->where('department.building_id', $building_id)
+            ->whereNotIn('department.department_id', $sincronizados)
+            ->get();
+        Log::info("DepartmentService departamentos sobrantes " . jsonLog($sobrantes));
+
+        $eliminar    = $sobrantes->where('con_movimientos', 0)->pluck('department_id');
+        $desactivar  = $sobrantes->where('con_movimientos', 1)->pluck('department_id');
+
+        if ($eliminar->isNotEmpty()) {
+            // Sus residentes (user) se eliminan en cascada.
+            DB::table('department')->whereIn('department_id', $eliminar)->delete();
+        }
+        if ($desactivar->isNotEmpty()) {
+            DB::table('department')->whereIn('department_id', $desactivar)->update(['state' => 0]);
+        }
+        $resumen['eliminados']   = $eliminar->count();
+        $resumen['desactivados'] = $desactivar->count();
+
+        return $resumen;
     }
     private function insertResidente($users, $department_id)
     {

@@ -19,6 +19,7 @@ class DatabaseService
         $department = DB::table('department')
             ->select('department.*')
             ->where('department.building_id', getLocker()->get('building_id'))
+            ->where('department.state', 1)
             ->get();
 
         $lockers = DB::table('locker')
@@ -30,6 +31,7 @@ class DatabaseService
             ->select('user.*')
             ->join('department', 'user.department_id', '=', 'department.department_id')
             ->where('department.building_id', getLocker()->get('building_id'))
+            ->where('department.state', 1)
             ->get();
 
         $controllers = DB::table('controller')
