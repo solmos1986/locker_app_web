@@ -134,7 +134,7 @@ class DoorController extends Controller
     {
         Log::info("DoorController openManual " . jsonLog([$id, $request->all()]));
         $request->validate([
-            'tipo'        => 'required|in:mantenimiento,limpieza,intervencion',
+            'tipo'        => 'required|in:mantenimiento,intervencion',
             'observacion' => 'required|string|max:255',
         ]);
         try {

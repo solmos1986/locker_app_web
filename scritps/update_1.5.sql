@@ -2,9 +2,10 @@
 --
 -- Toda apertura desde el panel queda auditada en door_event (usuario, tipo,
 -- motivo). Tipos:
---   mantenimiento / limpieza: solo abre; la entrega y el codigo siguen validos.
---   intervencion: el casillero tiene una entrega pendiente y se libera; ademas se
---     registra el movimiento "intervenido" en el mismo id_ref (como un retiro).
+--   mantenimiento (incluye limpieza): solo abre; solo si el casillero no tiene
+--     una entrega pendiente.
+--   intervencion: solo con entrega pendiente; la cierra y libera el casillero.
+--     Ademas se registra el movimiento "intervenido" en el mismo id_ref (como un retiro).
 --
 -- * type_movement 4 = intervenido.
 -- * movement.users_id: usuario del panel (tabla users) que intervino; NULL en

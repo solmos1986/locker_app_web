@@ -158,17 +158,25 @@ class DoorService
 
     /**
      * Apertura manual desde el panel, auditada en door_event.
-     * - mantenimiento / limpieza: solo abre; la entrega pendiente (si hay) sigue válida.
-     * - intervencion: el casillero tiene una entrega pendiente y se libera
+     * - mantenimiento (incluye limpieza): solo con el casillero sin entrega pendiente.
+     * - intervencion: solo con entrega pendiente; la cierra y libera el casillero
      *   (ver interveneDoor).
      */
     public function openManual($door_id, $tipo, $observacion)
     {
         Log::info("DoorService openManual " . jsonLog([$door_id, $tipo, $observacion]));
         $users_id = Auth::guard('api')->id();
+        $entrega  = $this->pendingDelivery($door_id);
 
         if ($tipo === 'intervencion') {
-            return $this->interveneDoor($door_id, $users_id, $observacion);
+            if (! $entrega) {
+                throw new RuntimeException('El casillero no tiene una entrega pendiente');
+            }
+            return $this->interveneDoor($entrega, $users_id, $observacion);
+        }
+
+        if ($entrega) {
+            throw new RuntimeException('El casillero tiene una entrega pendiente: solo se puede abrir como intervención');
         }
 
         $door_event_id = DB::table('door_event')->insertGetId([
@@ -182,14 +190,11 @@ class DoorService
     }
 
     /**
-     * Libera un casillero con una entrega pendiente: registra el movimiento
-     * "intervenido" (tipo 4) en el mismo id_ref y su door_event, notifica a
-     * Holding, abre la puerta y pide a la tablet que resincronice.
+     * Entrega (tipo 1) del casillero sin retiro (2) ni intervención (4), o null.
      */
-    private function interveneDoor($door_id, $users_id, $observacion)
+    private function pendingDelivery($door_id)
     {
-        Log::info("DoorService interveneDoor " . jsonLog([$door_id, $users_id, $observacion]));
-        $entrega = DB::table('movement')
+        return DB::table('movement')
             ->select(
                 'movement.movement_id',
                 'movement.id_ref',
@@ -215,10 +220,16 @@ class DoorService
             })
             ->orderByDesc('movement.movement_id')
             ->first();
+    }
 
-        if (! $entrega) {
-            throw new RuntimeException('El casillero no tiene una entrega pendiente');
-        }
+    /**
+     * Libera un casillero con una entrega pendiente: registra el movimiento
+     * "intervenido" (tipo 4) en el mismo id_ref y su door_event, notifica a
+     * Holding, abre la puerta y pide a la tablet que resincronice.
+     */
+    private function interveneDoor($entrega, $users_id, $observacion)
+    {
+        Log::info("DoorService interveneDoor " . jsonLog([$entrega->id_ref, $users_id, $observacion]));
 
         [$movement_id, $door_event_id] = DB::transaction(function () use ($entrega, $users_id, $observacion) {
             $movement_id = DB::table('movement')->insertGetId([
@@ -253,7 +264,7 @@ class DoorService
             $entrega->building_id
         );
 
-        $this->openDoor($door_id);
+        $this->openDoor($entrega->door_id);
         // La tablet invalida el código del residente al recargar sus datos.
         $this->updateDatabase($entrega->locker_id);
 
