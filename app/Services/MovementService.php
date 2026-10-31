@@ -25,6 +25,17 @@ class MovementService
                 'movement.create_at',
                 DB::raw("GROUP_CONCAT( type_movement.name SEPARATOR ' / ') as state"),
                 DB::raw("GROUP_CONCAT( IF(movement.status_integrate=1, 'si', 'no') SEPARATOR ' / ') as status_integrate"),
+                // Notificación a Holding: "enviada" = la entrega (allocated) llegó a Holding;
+                // "confirmada" = el retiro o la intervención (collected) llegó a Holding.
+                DB::raw("MAX(IF(movement.type_movement_id = 1, movement.status_integrate, 0)) as holding_enviada"),
+                DB::raw("MAX(IF(movement.type_movement_id IN (2, 4), movement.status_integrate, 0)) as holding_confirmada"),
+                DB::raw("MAX(movement.type_movement_id IN (2, 4)) as cerrado"),
+                // WhatsApp solo se envía al registrar la entrega.
+                DB::raw("MAX(IF(movement.type_movement_id = 1, movement.status_notificate, 0)) as whatsapp_enviado"),
+                // Fechas en UTC: la de la entrega y la del retiro (2) o intervención (4), si ya ocurrió.
+                DB::raw("MIN(IF(movement.type_movement_id = 1, movement.create_at, NULL)) as fecha_entrega"),
+                DB::raw("MAX(IF(movement.type_movement_id IN (2, 4), movement.create_at, NULL)) as fecha_cierre"),
+                DB::raw("MAX(IF(movement.type_movement_id IN (2, 4), movement.type_movement_id, NULL)) as tipo_cierre"),
             )
             ->join('door', 'door.door_id', 'movement.door_id')
             ->join('controller', 'controller.controller_id', 'door.controller_id')

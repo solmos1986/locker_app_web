@@ -96,21 +96,29 @@ class LockerService
                     'movement.movement_id',
                     'movement.id_ref',
                     'movement.door_id',
+                    'movement.type_movement_id',
+                    // Cuándo ocurrió el movimiento (update_at cambia al notificar a Holding).
                     // En UTC y sin formatear: el panel la convierte a la hora local.
-                    'movement.update_at',
-                    'type_movement.name'
+                    'movement.create_at',
+                    'type_movement.name',
+                    'department.name as departamento'
                 )
                 ->join('type_movement', 'type_movement.type_movement_id', 'movement.type_movement_id')
+                ->join('department', 'department.department_id', 'movement.department_id')
                 ->where('movement.door_id', $door->door_id)
                 ->orderBy('movement.movement_id', 'DESC')
-
                 ->first();
             if ($ultimo_movimiento) {
                 $door->tipo_movimiento = $ultimo_movimiento->name;
-                $door->update_at       = $ultimo_movimiento->update_at;
+                $door->update_at       = $ultimo_movimiento->create_at;
+                // Solo hay pedido en el casillero si el último movimiento es una entrega pendiente.
+                $door->departamento = (int) $ultimo_movimiento->type_movement_id === 1
+                    ? $ultimo_movimiento->departamento
+                    : null;
             } else {
                 $door->tipo_movimiento = '';
                 $door->update_at       = '';
+                $door->departamento    = null;
             }
         }
         return $doors;

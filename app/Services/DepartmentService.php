@@ -118,7 +118,11 @@ class DepartmentService
         });
         Log::info("DepartmentService createbyApi resumen " . jsonLog($resumen));
 
-        $this->notificarLockers($building_id);
+        // Solo si cambió algún departamento: la sincronización automática corre cada 5 minutos
+        // y cada aviso hace que la tablet descargue de nuevo toda su BD.
+        if (array_sum($resumen) > 0) {
+            $this->notificarLockers($building_id);
+        }
         return $resumen;
     }
 
@@ -144,7 +148,8 @@ class DepartmentService
 
     private function getDepatamentResidentesByApi($building_id)
     {
-        Log::info("DepartmentService/getDepatamentResidentesByApi " . jsonLog(getUser()));
+        // Sin getUser(): también se ejecuta desde consola (app:sync-departamentos), donde no hay JWT.
+        Log::info("DepartmentService/getDepatamentResidentesByApi " . jsonLog($building_id));
 
         try {
 
@@ -220,7 +225,8 @@ class DepartmentService
 
             if ($vefied_department != null) {
                 Log::info("DepartmentService modificar " . jsonLog($vefied_department));
-                DB::table('department')
+                // MySQL devuelve las filas que cambiaron, no las que coincidieron.
+                $cambios = DB::table('department')
                     ->where('department.department_id', $vefied_department->department_id)
                     ->update([
                         'name'   => $departament['name'],
@@ -229,7 +235,7 @@ class DepartmentService
                     ]);
                 $this->insertResidente($departament['users'], $vefied_department->department_id);
                 $sincronizados[] = $vefied_department->department_id;
-                $resumen['actualizados']++;
+                $resumen['actualizados'] += $cambios;
             } else {
                 Log::info("DepartmentService insert " . jsonLog($vefied_department));
                 $insert_department = DB::table('department')

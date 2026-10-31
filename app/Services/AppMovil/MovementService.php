@@ -85,7 +85,7 @@ class MovementService
             $movement_id
         );
 
-        $this->sendNotificationWhatsapp($code);
+        $this->sendNotificationWhatsapp($code, $movement_id);
 
     }
 
@@ -163,9 +163,9 @@ class MovementService
         }
     }
 
-    public function sendNotificationWhatsapp($code)
+    public function sendNotificationWhatsapp($code, $movement_id)
     {
-        Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code]));
+        Log::info("MovementService sendNotificationWhatsapp " . jsonLog([$code, $movement_id]));
         try {
             $client = new \GuzzleHttp\Client([
                 'verify' => false,
@@ -187,6 +187,13 @@ class MovementService
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($response->getStatusCode()));
             $body = $response->getBody();
             Log::info("MovementService sendNotificationWhatsapp " . jsonLog($body->getContents()));
+            // Guzzle lanza excepción ante 4xx/5xx: si llega aquí, la notificación se envió.
+            $update = DB::table('movement')
+                ->where('movement_id', $movement_id)
+                ->update([
+                    "status_notificate" => 1,
+                ]);
+            Log::info("MovementService sendNotificationWhatsapp modificado " . jsonLog($update));
         } catch (\Throwable $th) {
             Log::error($th);
             Log::info("MovementService sendNotificationWhatsapp error al notificar al servidor");
