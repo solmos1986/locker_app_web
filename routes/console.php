@@ -9,6 +9,8 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Requiere en el servidor: * * * * * php /ruta/locker_app_web/artisan schedule:run
+// Se activa con SYNC_DEPARTAMENTOS_ENABLED=true (config/app.php).
 Schedule::command('app:sync-departamentos')
     ->everyFiveMinutes()
-    ->withoutOverlapping();
+    ->withoutOverlapping()
+    ->when(fn () => config('app.sync_departamentos'));

@@ -69,6 +69,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Sincronización automática de departamentos
+    |--------------------------------------------------------------------------
+    |
+    | Activa la tarea programada app:sync-departamentos (cada 5 minutos, ver
+    | routes/console.php). Apagada por defecto: la primera ejecución reemplaza
+    | los departamentos de cada edificio por los de la API de Holding.
+    |
+    */
+
+    'sync_departamentos' => (bool) env('SYNC_DEPARTAMENTOS_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |
