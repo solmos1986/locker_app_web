@@ -63,6 +63,9 @@ return [
             'path'                 => storage_path('logs/' . date('Y') . '/' . date('F') . '/' . date('d') . '.log'),
             'level'                => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+            // Se crea un archivo por día: escribible por el grupo para que la web (www)
+            // y el cron puedan escribir en el archivo que haya creado el otro.
+            'permission'           => 0664,
         ],
 
         'daily'                  => [
@@ -128,9 +131,10 @@ return [
         ],
 
         'cronJob' => [
-            'driver' => 'single',
-            'path'   => storage_path('logs_cronJob/' . date('Y') . '/' . date('F') . '/' . date('d') . '.log'),
-            'level'  => 'debug',
+            'driver'     => 'single',
+            'path'       => storage_path('logs_cronJob/' . date('Y') . '/' . date('F') . '/' . date('d') . '.log'),
+            'level'      => 'debug',
+            'permission' => 0664,
         ],
 
     ],
