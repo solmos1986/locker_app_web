@@ -58,14 +58,17 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        // Un archivo por día (laravel-AAAA-MM-DD.log) en una carpeta fija: no se crean
+        // subcarpetas nuevas. 0666 para que la web (www) y el cron (root) puedan escribir
+        // en el archivo del día lo haya creado quien lo haya creado. El driver "daily"
+        // calcula la fecha en cada escritura, así que funciona también con config:cache.
         'single'                 => [
-            'driver'               => 'single',
-            'path'                 => storage_path('logs/' . date('Y') . '/' . date('F') . '/' . date('d') . '.log'),
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/laravel.log'),
             'level'                => env('LOG_LEVEL', 'debug'),
+            'days'                 => env('LOG_DAILY_DAYS', 30),
             'replace_placeholders' => true,
-            // Se crea un archivo por día: escribible por el grupo para que la web (www)
-            // y el cron puedan escribir en el archivo que haya creado el otro.
-            'permission'           => 0664,
+            'permission'           => 0666,
         ],
 
         'daily'                  => [
@@ -130,11 +133,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // Igual que "single": cron-AAAA-MM-DD.log en storage/logs_cronJob/.
         'cronJob' => [
-            'driver'     => 'single',
-            'path'       => storage_path('logs_cronJob/' . date('Y') . '/' . date('F') . '/' . date('d') . '.log'),
+            'driver'     => 'daily',
+            'path'       => storage_path('logs_cronJob/cron.log'),
             'level'      => 'debug',
-            'permission' => 0664,
+            'days'       => env('LOG_DAILY_DAYS', 30),
+            'permission' => 0666,
         ],
 
     ],

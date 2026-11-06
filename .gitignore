@@ -5,7 +5,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
-/storage/logs_cronJob/
+/storage/logs_cronJob/*
+!/storage/logs_cronJob/.gitignore
 /vendor
 .env
 .env.backup
