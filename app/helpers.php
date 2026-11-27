@@ -583,7 +583,7 @@ if (! function_exists('getComandClosed')) {
                 'name'   => 'cerrado',
             ],
             [
-                'comand' => '80010700b6',
+                'comand' => '8001070086',
                 'name'   => 'cerrado',
             ],
             [
