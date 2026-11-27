@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\DatedStreamHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -18,7 +19,7 @@ return [
     |
     */
 
-    'default'      => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ return [
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
-        'trace'   => env('LOG_DEPRECATIONS_TRACE', false),
+        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
     ],
 
     /*
@@ -50,96 +51,93 @@ return [
     |
     */
 
-    'channels'     => [
+    'channels' => [
 
-        'stack'                  => [
-            'driver'            => 'stack',
-            'channels'          => explode(',', env('LOG_STACK', 'single')),
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => explode(',', env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 
-        // Un archivo por día (laravel-AAAA-MM-DD.log) en una carpeta fija: no se crean
-        // subcarpetas nuevas. 0666 para que la web (www) y el cron (root) puedan escribir
-        // en el archivo del día lo haya creado quien lo haya creado. El driver "daily"
-        // calcula la fecha en cada escritura, así que funciona también con config:cache.
-        'single'                 => [
-            'driver'               => 'daily',
-            'path'                 => storage_path('logs/laravel.log'),
-            'level'                => env('LOG_LEVEL', 'debug'),
-            'days'                 => env('LOG_DAILY_DAYS', 30),
-            'replace_placeholders' => true,
-            'permission'           => 0666,
+        // storage/logs/AAAA/Mes/DD.log. Ver App\Logging\DatedStreamHandler: carpetas 0777 y
+        // archivos 0666 para que la web (www) y el cron (root) puedan escribir en lo que haya
+        // creado el otro; la fecha se calcula en cada escritura (funciona con config:cache).
+        'single' => [
+            'driver' => 'monolog',
+            'handler' => DatedStreamHandler::class,
+            'handler_with' => ['directory' => storage_path('logs')],
+            'level' => env('LOG_LEVEL', 'debug'),
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
-        'daily'                  => [
-            'driver'               => 'daily',
-            'path'                 => storage_path('logs/laravel.log'),
-            'level'                => env('LOG_LEVEL', 'debug'),
-            'days'                 => env('LOG_DAILY_DAYS', 14),
+        'daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
         ],
 
-        'slack'                  => [
-            'driver'               => 'slack',
-            'url'                  => env('LOG_SLACK_WEBHOOK_URL'),
-            'username'             => env('LOG_SLACK_USERNAME', 'Laravel Log'),
-            'emoji'                => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level'                => env('LOG_LEVEL', 'critical'),
+        'slack' => [
+            'driver' => 'slack',
+            'url' => env('LOG_SLACK_WEBHOOK_URL'),
+            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+            'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
+            'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
 
-        'papertrail'             => [
-            'driver'       => 'monolog',
-            'level'        => env('LOG_LEVEL', 'debug'),
-            'handler'      => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
+        'papertrail' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
             'handler_with' => [
-                'host'             => env('PAPERTRAIL_URL'),
-                'port'             => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
+                'host' => env('PAPERTRAIL_URL'),
+                'port' => env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
             ],
-            'processors'   => [PsrLogMessageProcessor::class],
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
-        'stderr'                 => [
-            'driver'       => 'monolog',
-            'level'        => env('LOG_LEVEL', 'debug'),
-            'handler'      => StreamHandler::class,
+        'stderr' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
             'handler_with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter'    => env('LOG_STDERR_FORMATTER'),
-            'processors'   => [PsrLogMessageProcessor::class],
+            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
-        'syslog'                 => [
-            'driver'               => 'syslog',
-            'level'                => env('LOG_LEVEL', 'debug'),
-            'facility'             => env('LOG_SYSLOG_FACILITY', LOG_USER),
+        'syslog' => [
+            'driver' => 'syslog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
             'replace_placeholders' => true,
         ],
 
-        'errorlog'               => [
-            'driver'               => 'errorlog',
-            'level'                => env('LOG_LEVEL', 'debug'),
+        'errorlog' => [
+            'driver' => 'errorlog',
+            'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
 
-        'null'                   => [
-            'driver'  => 'monolog',
+        'null' => [
+            'driver' => 'monolog',
             'handler' => NullHandler::class,
         ],
 
-        'emergency'              => [
+        'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        // Igual que "single": cron-AAAA-MM-DD.log en storage/logs_cronJob/.
+        // Igual que "single": storage/logs_cronJob/AAAA/Mes/DD.log.
         'cronJob' => [
-            'driver'     => 'daily',
-            'path'       => storage_path('logs_cronJob/cron.log'),
-            'level'      => 'debug',
-            'days'       => env('LOG_DAILY_DAYS', 30),
-            'permission' => 0666,
+            'driver' => 'monolog',
+            'handler' => DatedStreamHandler::class,
+            'handler_with' => ['directory' => storage_path('logs_cronJob')],
+            'level' => 'debug',
         ],
 
     ],
