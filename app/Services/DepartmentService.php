@@ -213,7 +213,6 @@ class DepartmentService
      */
     private function insertDepartamentResident($departaments, $building_id)
     {
-        Log::info("DepartmentService insertDepartamentResident " . jsonLog($departaments));
         $sincronizados = [];
         $resumen       = ['actualizados' => 0, 'creados' => 0, 'eliminados' => 0, 'desactivados' => 0];
 
@@ -224,7 +223,6 @@ class DepartmentService
                 ->first();
 
             if ($vefied_department != null) {
-                Log::info("DepartmentService modificar " . jsonLog($vefied_department));
                 // MySQL devuelve las filas que cambiaron, no las que coincidieron.
                 $cambios = DB::table('department')
                     ->where('department.department_id', $vefied_department->department_id)
@@ -237,7 +235,6 @@ class DepartmentService
                 $sincronizados[] = $vefied_department->department_id;
                 $resumen['actualizados'] += $cambios;
             } else {
-                Log::info("DepartmentService insert " . jsonLog($vefied_department));
                 $insert_department = DB::table('department')
                     ->insertGetId([
                         'name'        => $departament['name'],
